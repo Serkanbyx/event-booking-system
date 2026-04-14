@@ -87,7 +87,9 @@ app.get('/api/health', (_req, res) => {
   });
 });
 
-// Route mounting (Steps 4+)
+// Route mounting
+const authRoutes = require('./routes/authRoutes');
+app.use('/api/auth', authRoutes);
 
 // 404 handler
 app.use((_req, _res, next) => {
