@@ -242,6 +242,200 @@ const cancelEvent = async (req, res, next) => {
   }
 };
 
+/**
+ * Escape regex special characters to prevent ReDoS attacks.
+ */
+const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// @desc    List published events with filtering, search, sorting, pagination
+// @route   GET /api/events
+const getEvents = async (req, res, next) => {
+  try {
+    const {
+      page = 1,
+      limit = 12,
+      search,
+      category,
+      city,
+      dateFrom,
+      dateTo,
+      priceMin,
+      priceMax,
+      sort = 'date',
+      upcoming,
+    } = req.query;
+
+    const filter = { status: 'published' };
+
+    if (search) {
+      const searchRegex = new RegExp(escapeRegex(search), 'i');
+      filter.$or = [{ title: searchRegex }, { description: searchRegex }];
+    }
+
+    if (category) filter.category = category;
+    if (city) filter['location.city'] = new RegExp(`^${escapeRegex(city)}$`, 'i');
+
+    if (dateFrom || dateTo) {
+      filter.date = {};
+      if (dateFrom) filter.date.$gte = new Date(dateFrom);
+      if (dateTo) filter.date.$lte = new Date(dateTo);
+    }
+
+    if (priceMin !== undefined || priceMax !== undefined) {
+      filter.price = {};
+      if (priceMin !== undefined) filter.price.$gte = Number(priceMin);
+      if (priceMax !== undefined) filter.price.$lte = Number(priceMax);
+    }
+
+    if (upcoming === 'true') {
+      filter.date = { ...filter.date, $gte: new Date() };
+    }
+
+    const sortOptions = {
+      date: { date: 1 },
+      '-date': { date: -1 },
+      price: { price: 1 },
+      '-price': { price: -1 },
+      title: { title: 1 },
+      createdAt: { createdAt: -1 },
+    };
+    const sortBy = sortOptions[sort] || { date: 1 };
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 12));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [events, total] = await Promise.all([
+      Event.find(filter)
+        .sort(sortBy)
+        .skip(skip)
+        .limit(limitNum)
+        .populate('organizer', 'name avatar'),
+      Event.countDocuments(filter),
+    ]);
+
+    const totalPages = Math.ceil(total / limitNum);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        events,
+        page: pageNum,
+        totalPages,
+        total,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get a single published event by slug
+// @route   GET /api/events/:slug
+const getEventBySlug = async (req, res, next) => {
+  try {
+    const event = await Event.findOne({
+      slug: req.params.slug,
+      status: 'published',
+    }).populate('organizer', 'name avatar');
+
+    if (!event) {
+      const error = new Error('Event not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const response = { event };
+
+    if (req.user) {
+      const Registration = mongoose.models.Registration;
+      if (Registration) {
+        const existingRegistration = await Registration.findOne({
+          event: event._id,
+          user: req.user._id,
+          status: { $ne: 'cancelled' },
+        });
+        response.isRegistered = !!existingRegistration;
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: response,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get a single published event by ID (internal use)
+// @route   GET /api/events/id/:id
+const getEventById = async (req, res, next) => {
+  try {
+    const event = await Event.findOne({
+      _id: req.params.id,
+      status: 'published',
+    }).populate('organizer', 'name avatar');
+
+    if (!event) {
+      const error = new Error('Event not found');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    res.status(200).json({
+      success: true,
+      data: { event },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get featured upcoming published events
+// @route   GET /api/events/featured
+const getFeaturedEvents = async (req, res, next) => {
+  try {
+    const events = await Event.find({
+      status: 'published',
+      isFeatured: true,
+      date: { $gte: new Date() },
+    })
+      .sort({ date: 1 })
+      .limit(6)
+      .populate('organizer', 'name avatar');
+
+    res.status(200).json({
+      success: true,
+      data: { events },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get aggregated category list with event counts
+// @route   GET /api/events/categories
+const getEventCategories = async (req, res, next) => {
+  try {
+    const categories = await Event.aggregate([
+      { $match: { status: 'published' } },
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $project: { _id: 0, category: '$_id', count: 1 } },
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: { categories },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 // @desc    Get events organized by the current user
 // @route   GET /api/events/my/organized
 const getMyEvents = async (req, res, next) => {
@@ -290,4 +484,9 @@ module.exports = {
   publishEvent,
   cancelEvent,
   getMyEvents,
+  getEvents,
+  getEventBySlug,
+  getEventById,
+  getFeaturedEvents,
+  getEventCategories,
 };

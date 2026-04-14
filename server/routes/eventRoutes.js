@@ -1,5 +1,6 @@
 const express = require('express');
-const { protect, organizerOnly } = require('../middlewares/auth');
+const { protect, optionalAuth, organizerOnly } = require('../middlewares/auth');
+const { globalLimiter } = require('../middlewares/rateLimiter');
 const {
   createEvent,
   updateEvent,
@@ -7,9 +8,18 @@ const {
   publishEvent,
   cancelEvent,
   getMyEvents,
+  getEvents,
+  getEventBySlug,
+  getEventById,
+  getFeaturedEvents,
+  getEventCategories,
 } = require('../controllers/eventController');
 
 const router = express.Router();
+
+// Public routes (specific paths BEFORE :slug param route)
+router.get('/featured', globalLimiter, getFeaturedEvents);
+router.get('/categories', globalLimiter, getEventCategories);
 
 // Organizer routes (require authentication + organizer/admin role)
 router.get('/my/organized', protect, organizerOnly, getMyEvents);
@@ -18,5 +28,10 @@ router.put('/:id', protect, organizerOnly, updateEvent);
 router.delete('/:id', protect, organizerOnly, deleteEvent);
 router.put('/:id/publish', protect, organizerOnly, publishEvent);
 router.put('/:id/cancel', protect, organizerOnly, cancelEvent);
+
+// Public routes with param (AFTER specific routes)
+router.get('/', globalLimiter, optionalAuth, getEvents);
+router.get('/id/:id', globalLimiter, getEventById);
+router.get('/:slug', globalLimiter, optionalAuth, getEventBySlug);
 
 module.exports = router;
