@@ -11,6 +11,7 @@ const path = require('path');
 const env = require('./config/env');
 const connectDB = require('./config/db');
 const { globalLimiter } = require('./middlewares/rateLimiter');
+const { verifyConnection } = require('./utils/emailService');
 
 const app = express();
 
@@ -113,6 +114,8 @@ app.use((err, _req, res, _next) => {
 
 // Connect to DB, then start server
 connectDB().then(() => {
+  verifyConnection();
+
   app.listen(env.PORT, () => {
     console.log(
       `Server running in ${env.NODE_ENV} mode on port ${env.PORT}`
