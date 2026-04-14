@@ -1,64 +1,117 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const mongoSanitize = require("express-mongo-sanitize");
-const rateLimit = require("express-rate-limit");
-const path = require("path");
-
+const dotenv = require('dotenv');
 dotenv.config();
+
+const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
+const morgan = require('morgan');
+const mongoSanitize = require('express-mongo-sanitize');
+const path = require('path');
+
+const env = require('./config/env');
+const connectDB = require('./config/db');
+const { globalLimiter } = require('./middlewares/rateLimiter');
 
 const app = express();
 
-// Security middlewares
-app.use(helmet());
-app.use(mongoSanitize());
+// Disable x-powered-by header
+app.disable('x-powered-by');
+
+// Security headers with CSP
+if (env.NODE_ENV === 'production') {
+  app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"],
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: ["'self'", 'data:', 'blob:'],
+          connectSrc: ["'self'"],
+          fontSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          frameSrc: ["'none'"],
+        },
+      },
+      crossOriginEmbedderPolicy: false,
+    })
+  );
+} else {
+  app.use(helmet({ contentSecurityPolicy: false }));
+}
+
+// CORS — strict origin
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: env.CLIENT_URL,
     credentials: true,
   })
 );
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { error: "Too many requests, please try again later." },
+// Body parsing with size limits
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Mongo sanitize (Express 5 compatible — do NOT use mongoSanitize() directly)
+app.use((req, _res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  next();
 });
-app.use("/api", limiter);
 
-// Body parsing
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// Logging (development only)
-if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev"));
+// HTTP request logging
+if (env.NODE_ENV === 'production') {
+  app.use(morgan('combined'));
+} else {
+  app.use(morgan('dev'));
 }
 
-// Static files
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Global rate limiter for all /api routes
+app.use('/api', globalLimiter);
+
+// Static files — block directory listing and dotfiles
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, 'uploads'), {
+    dotfiles: 'deny',
+    index: false,
+  })
+);
 
 // Health check
-app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'API is running',
+    timestamp: new Date().toISOString(),
+  });
 });
 
-// MongoDB connection & server start
-const PORT = process.env.PORT || 5000;
+// Route mounting (Steps 4+)
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected successfully");
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
+// 404 handler
+app.use((_req, _res, next) => {
+  const error = new Error('Route not found');
+  error.statusCode = 404;
+  next(error);
+});
+
+// Global error handler
+app.use((err, _req, res, _next) => {
+  const statusCode = err.statusCode || 500;
+
+  res.status(statusCode).json({
+    success: false,
+    message: err.message || 'Internal server error',
+    ...(env.NODE_ENV === 'development' && { stack: err.stack }),
   });
+});
+
+// Connect to DB, then start server
+connectDB().then(() => {
+  app.listen(env.PORT, () => {
+    console.log(
+      `Server running in ${env.NODE_ENV} mode on port ${env.PORT}`
+    );
+  });
+});
