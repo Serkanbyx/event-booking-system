@@ -92,9 +92,11 @@ app.get('/api/health', (_req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 const registrationRoutes = require('./routes/registrationRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/registrations', registrationRoutes);
+app.use('/api/upload', uploadRoutes);
 
 // 404 handler
 app.use((_req, _res, next) => {
