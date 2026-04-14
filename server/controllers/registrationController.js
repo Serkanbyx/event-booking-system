@@ -249,10 +249,210 @@ const getRegistrationByCode = async (req, res, next) => {
   }
 };
 
+// @desc    Get all registrations for a specific event (organizer/admin)
+// @route   GET /api/events/:id/registrations
+const getEventRegistrations = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      throw new AppError('Event not found', 404);
+    }
+
+    const isOrganizer =
+      event.organizer.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOrganizer && !isAdmin) {
+      throw new AppError('Not authorized to view registrations for this event', 403);
+    }
+
+    const { status, search, page = 1, limit = 20 } = req.query;
+
+    const filter = { event: event._id };
+    if (status && ['confirmed', 'cancelled', 'attended'].includes(status)) {
+      filter.status = status;
+    }
+
+    const pageNum = Math.max(1, parseInt(page, 10) || 1);
+    const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10) || 20));
+    const skip = (pageNum - 1) * limitNum;
+
+    let registrationsQuery = Registration.find(filter)
+      .sort({ registeredAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .populate('user', 'name email phone avatar');
+
+    const [registrations, total, confirmedCount, cancelledCount, attendedCount] =
+      await Promise.all([
+        registrationsQuery,
+        Registration.countDocuments(filter),
+        Registration.countDocuments({ event: event._id, status: 'confirmed' }),
+        Registration.countDocuments({ event: event._id, status: 'cancelled' }),
+        Registration.countDocuments({ event: event._id, status: 'attended' }),
+      ]);
+
+    // Filter by user name/email if search query provided
+    let filteredRegistrations = registrations;
+    if (search) {
+      const searchRegex = new RegExp(search, 'i');
+      filteredRegistrations = registrations.filter(
+        (reg) =>
+          searchRegex.test(reg.user?.name) || searchRegex.test(reg.user?.email)
+      );
+    }
+
+    const totalConfirmed = confirmedCount;
+    const totalCancelled = cancelledCount;
+    const capacityPercentage =
+      event.capacity > 0
+        ? Math.round(((confirmedCount + attendedCount) / event.capacity) * 100)
+        : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        registrations: filteredRegistrations,
+        stats: {
+          totalConfirmed,
+          totalCancelled,
+          totalAttended: attendedCount,
+          capacityPercentage,
+        },
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          pages: Math.ceil(total / limitNum),
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Check in an attendee (organizer/admin)
+// @route   PUT /api/registrations/:id/check-in
+const checkInAttendee = async (req, res, next) => {
+  try {
+    // Find by ID or confirmation code
+    let registration = await Registration.findById(req.params.id).populate(
+      'event',
+      'organizer title'
+    );
+
+    if (!registration) {
+      registration = await Registration.findOne({
+        confirmationCode: req.params.id.toUpperCase(),
+      }).populate('event', 'organizer title');
+    }
+
+    if (!registration) {
+      throw new AppError('Registration not found', 404);
+    }
+
+    const isOrganizer =
+      registration.event.organizer.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOrganizer && !isAdmin) {
+      throw new AppError('Not authorized to check in attendees for this event', 403);
+    }
+
+    if (registration.status === 'attended') {
+      throw new AppError('Attendee has already been checked in', 400);
+    }
+
+    if (registration.status === 'cancelled') {
+      throw new AppError('Cannot check in a cancelled registration', 400);
+    }
+
+    if (registration.status !== 'confirmed') {
+      throw new AppError('Only confirmed registrations can be checked in', 400);
+    }
+
+    registration.status = 'attended';
+    await registration.save();
+
+    await registration.populate('user', 'name email avatar');
+
+    res.status(200).json({
+      success: true,
+      message: 'Attendee checked in successfully',
+      data: { registration },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// @desc    Get event statistics (organizer/admin)
+// @route   GET /api/events/:id/stats
+const getEventStats = async (req, res, next) => {
+  try {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+      throw new AppError('Event not found', 404);
+    }
+
+    const isOrganizer =
+      event.organizer.toString() === req.user._id.toString();
+    const isAdmin = req.user.role === 'admin';
+
+    if (!isOrganizer && !isAdmin) {
+      throw new AppError('Not authorized to view stats for this event', 403);
+    }
+
+    const [totalRegistrations, confirmedCount, cancelledCount, attendedCount] =
+      await Promise.all([
+        Registration.countDocuments({ event: event._id }),
+        Registration.countDocuments({ event: event._id, status: 'confirmed' }),
+        Registration.countDocuments({ event: event._id, status: 'cancelled' }),
+        Registration.countDocuments({ event: event._id, status: 'attended' }),
+      ]);
+
+    const capacityPercentage =
+      event.capacity > 0
+        ? Math.round(((confirmedCount + attendedCount) / event.capacity) * 100)
+        : 0;
+
+    const revenueEstimate = event.price * confirmedCount;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        event: {
+          id: event._id,
+          title: event.title,
+          capacity: event.capacity,
+          price: event.price,
+          currency: event.currency,
+        },
+        stats: {
+          totalRegistrations,
+          confirmedCount,
+          cancelledCount,
+          attendedCount,
+          capacityPercentage,
+          revenueEstimate,
+        },
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   registerForEvent,
   cancelRegistration,
   getMyRegistrations,
   getRegistrationById,
   getRegistrationByCode,
+  getEventRegistrations,
+  checkInAttendee,
+  getEventStats,
 };

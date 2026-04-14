@@ -14,7 +14,11 @@ const {
   getFeaturedEvents,
   getEventCategories,
 } = require('../controllers/eventController');
-const { registerForEvent } = require('../controllers/registrationController');
+const {
+  registerForEvent,
+  getEventRegistrations,
+  getEventStats,
+} = require('../controllers/registrationController');
 
 const router = express.Router();
 
@@ -29,6 +33,10 @@ router.put('/:id', protect, organizerOnly, updateEvent);
 router.delete('/:id', protect, organizerOnly, deleteEvent);
 router.put('/:id/publish', protect, organizerOnly, publishEvent);
 router.put('/:id/cancel', protect, organizerOnly, cancelEvent);
+
+// Event registration management (organizer/admin)
+router.get('/:id/registrations', protect, organizerOnly, getEventRegistrations);
+router.get('/:id/stats', protect, organizerOnly, getEventStats);
 
 // Event registration (authenticated users)
 router.post('/:id/register', protect, registrationLimiter, registerForEvent);
