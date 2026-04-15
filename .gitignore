@@ -1,38 +1,35 @@
 # Dependencies
 node_modules/
 
-# Environment & secrets
+# Environment files
 .env
 .env.local
-.env.production
 .env.*.local
+
+# Certificates / keys
 *.pem
 *.key
 *.cert
 
-# Build output
-dist/
-build/
-
-# Uploads (user-generated content)
+# Uploads (keep directory, ignore contents)
 uploads/*
 !uploads/.gitkeep
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
 npm-debug.log*
 
-# OS files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Coverage & testing
-coverage/
-.nyc_output/
+# Build outputs
+dist/
+build/

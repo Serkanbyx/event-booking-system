@@ -6,6 +6,7 @@ const {
   updateEventStatusRules,
 } = require('../validators/adminValidator');
 const { paginationRules } = require('../validators/queryValidator');
+const { mongoIdParam } = require('../validators/paramValidator');
 const {
   getAdminDashboard,
   getAllUsers,
@@ -28,19 +29,20 @@ router.get('/dashboard', getAdminDashboard);
 
 // User management
 router.get('/users', paginationRules, validate, getAllUsers);
-router.put('/users/:id/role', updateUserRoleRules, validate, updateUserRole);
-router.put('/users/:id/toggle-active', toggleUserActive);
-router.delete('/users/:id', deleteUser);
+router.put('/users/:id/role', mongoIdParam(), updateUserRoleRules, validate, updateUserRole);
+router.put('/users/:id/toggle-active', mongoIdParam(), validate, toggleUserActive);
+router.delete('/users/:id', mongoIdParam(), validate, deleteUser);
 
 // Event management
 router.get('/events', paginationRules, validate, getAllEvents);
 router.put(
   '/events/:id/status',
+  mongoIdParam(),
   updateEventStatusRules,
   validate,
   adminUpdateEventStatus
 );
-router.delete('/events/:id', adminDeleteEvent);
+router.delete('/events/:id', mongoIdParam(), validate, adminDeleteEvent);
 
 // Registration management
 router.get('/registrations', paginationRules, validate, getAllRegistrations);

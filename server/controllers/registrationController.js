@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Registration = require('../models/Registration');
 const Event = require('../models/Event');
 const AppError = require('../utils/AppError');
+const escapeRegex = require('../utils/escapeRegex');
 const { sendEmail } = require('../utils/emailService');
 const generateConfirmationEmail = require('../templates/confirmationEmail');
 const generateCancellationEmail = require('../templates/cancellationEmail');
@@ -293,10 +294,9 @@ const getEventRegistrations = async (req, res, next) => {
         Registration.countDocuments({ event: event._id, status: 'attended' }),
       ]);
 
-    // Filter by user name/email if search query provided
     let filteredRegistrations = registrations;
     if (search) {
-      const searchRegex = new RegExp(search, 'i');
+      const searchRegex = new RegExp(escapeRegex(search), 'i');
       filteredRegistrations = registrations.filter(
         (reg) =>
           searchRegex.test(reg.user?.name) || searchRegex.test(reg.user?.email)

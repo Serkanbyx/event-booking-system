@@ -29,9 +29,16 @@ const uploadLimiter = rateLimit({
   message: rateLimitResponse,
 });
 
+const confirmationLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  message: rateLimitResponse,
+});
+
 module.exports = {
   globalLimiter,
   authLimiter,
   registrationLimiter,
   uploadLimiter,
+  confirmationLimiter,
 };

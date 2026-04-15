@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
+const escapeRegex = require('../utils/escapeRegex');
 
 const ALLOWED_FIELDS = [
   'title',
@@ -241,11 +242,6 @@ const cancelEvent = async (req, res, next) => {
     next(err);
   }
 };
-
-/**
- * Escape regex special characters to prevent ReDoS attacks.
- */
-const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // @desc    List published events with filtering, search, sorting, pagination
 // @route   GET /api/events

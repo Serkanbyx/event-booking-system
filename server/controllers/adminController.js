@@ -3,11 +3,7 @@ const User = require('../models/User');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
 const AppError = require('../utils/AppError');
-
-/**
- * Escape regex special characters to prevent ReDoS attacks.
- */
-const escapeRegex = (string) => string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const escapeRegex = require('../utils/escapeRegex');
 
 /**
  * Valid role values for user role updates.

@@ -11,6 +11,7 @@ const path = require('path');
 const env = require('./config/env');
 const connectDB = require('./config/db');
 const { globalLimiter } = require('./middlewares/rateLimiter');
+const errorHandler = require('./middlewares/errorHandler');
 const { verifyConnection } = require('./utils/emailService');
 
 const app = express();
@@ -112,15 +113,7 @@ app.use((_req, _res, next) => {
 });
 
 // Global error handler
-app.use((err, _req, res, _next) => {
-  const statusCode = err.statusCode || 500;
-
-  res.status(statusCode).json({
-    success: false,
-    message: err.message || 'Internal server error',
-    ...(env.NODE_ENV === 'development' && { stack: err.stack }),
-  });
-});
+app.use(errorHandler);
 
 // Connect to DB, then start server
 connectDB().then(() => {

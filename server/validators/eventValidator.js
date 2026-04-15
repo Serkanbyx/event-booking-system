@@ -28,7 +28,8 @@ const createEventRules = [
     .withMessage('Description is required')
     .trim()
     .isLength({ min: 10, max: 5000 })
-    .withMessage('Description must be between 10 and 5000 characters'),
+    .withMessage('Description must be between 10 and 5000 characters')
+    .escape(),
 
   body('date')
     .notEmpty()

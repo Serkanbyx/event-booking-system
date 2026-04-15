@@ -5,6 +5,7 @@ const validate = require('../middlewares/validate');
 const { createEventRules, updateEventRules } = require('../validators/eventValidator');
 const { registerForEventRules } = require('../validators/registrationValidator');
 const { eventFilterRules } = require('../validators/queryValidator');
+const { mongoIdParam } = require('../validators/paramValidator');
 const {
   createEvent,
   updateEvent,
@@ -33,20 +34,21 @@ router.get('/categories', globalLimiter, getEventCategories);
 // Organizer routes (require authentication + organizer/admin role)
 router.get('/my/organized', protect, organizerOnly, getMyEvents);
 router.post('/', protect, organizerOnly, createEventRules, validate, createEvent);
-router.put('/:id', protect, organizerOnly, updateEventRules, validate, updateEvent);
-router.delete('/:id', protect, organizerOnly, deleteEvent);
-router.put('/:id/publish', protect, organizerOnly, publishEvent);
-router.put('/:id/cancel', protect, organizerOnly, cancelEvent);
+router.put('/:id', protect, organizerOnly, mongoIdParam(), updateEventRules, validate, updateEvent);
+router.delete('/:id', protect, organizerOnly, mongoIdParam(), validate, deleteEvent);
+router.put('/:id/publish', protect, organizerOnly, mongoIdParam(), validate, publishEvent);
+router.put('/:id/cancel', protect, organizerOnly, mongoIdParam(), validate, cancelEvent);
 
 // Event registration management (organizer/admin)
-router.get('/:id/registrations', protect, organizerOnly, getEventRegistrations);
-router.get('/:id/stats', protect, organizerOnly, getEventStats);
+router.get('/:id/registrations', protect, organizerOnly, mongoIdParam(), validate, getEventRegistrations);
+router.get('/:id/stats', protect, organizerOnly, mongoIdParam(), validate, getEventStats);
 
 // Event registration (authenticated users)
 router.post(
   '/:id/register',
   protect,
   registrationLimiter,
+  mongoIdParam(),
   registerForEventRules,
   validate,
   registerForEvent
@@ -54,7 +56,7 @@ router.post(
 
 // Public routes with param (AFTER specific routes)
 router.get('/', globalLimiter, optionalAuth, eventFilterRules, validate, getEvents);
-router.get('/id/:id', globalLimiter, getEventById);
+router.get('/id/:id', globalLimiter, mongoIdParam(), validate, getEventById);
 router.get('/:slug', globalLimiter, optionalAuth, getEventBySlug);
 
 module.exports = router;
