@@ -42,7 +42,7 @@ const calculatePasswordStrength = (password) => {
 
 const ProfileSection = ({ user, updateUser }) => {
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     bio: '',
     phone: '',
     avatar: '',
@@ -52,7 +52,7 @@ const ProfileSection = ({ user, updateUser }) => {
   useEffect(() => {
     if (user) {
       setFormData({
-        fullName: user.fullName || '',
+        name: user.name || '',
         bio: user.bio || '',
         phone: user.phone || '',
         avatar: user.avatar || '',
@@ -69,7 +69,8 @@ const ProfileSection = ({ user, updateUser }) => {
     try {
       setSaving(true);
       const response = await authService.updateProfile(formData);
-      updateUser(response.data || formData);
+      const updatedUser = response.data?.user || response.data || formData;
+      updateUser(updatedUser);
       toast.success('Profile updated');
     } catch {
       toast.error('Failed to update profile');
@@ -107,14 +108,14 @@ const ProfileSection = ({ user, updateUser }) => {
       </div>
 
       <div>
-        <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
           Full Name
         </label>
         <input
-          id="fullName"
+          id="name"
           type="text"
-          value={formData.fullName}
-          onChange={(e) => handleChange('fullName', e.target.value)}
+          value={formData.name}
+          onChange={(e) => handleChange('name', e.target.value)}
           className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600
                      bg-white dark:bg-gray-800 text-gray-900 dark:text-white
                      focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-colors"

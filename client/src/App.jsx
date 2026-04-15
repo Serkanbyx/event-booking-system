@@ -18,6 +18,7 @@ import HomePage from './pages/HomePage';
 import EventListPage from './pages/EventListPage';
 import EventDetailPage from './pages/EventDetailPage';
 import PublicProfilePage from './pages/PublicProfilePage';
+import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 // Auth Pages
@@ -73,6 +74,7 @@ const App = () => {
           <Route index element={<HomePage />} />
           <Route path="events" element={<EventListPage />} />
           <Route path="events/:slug" element={<EventDetailPage />} />
+          <Route path="about" element={<AboutPage />} />
           <Route path="users/:id" element={<PublicProfilePage />} />
         </Route>
 

@@ -218,16 +218,18 @@ const HomePage = () => {
               </div>
             </form>
 
-            {/* Quick Stats */}
-            <div className="mt-12 flex flex-wrap items-center justify-center gap-8 sm:gap-12">
+            {/* Trust Badges */}
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 sm:gap-10">
               {[
-                { label: 'Events', value: '500+' },
-                { label: 'Attendees', value: '10,000+' },
-                { label: 'Organizers', value: '200+' },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</div>
-                  <div className="text-sm text-primary-200 mt-1">{stat.label}</div>
+                { icon: 'M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z', label: 'Verified Events' },
+                { icon: 'M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z', label: 'Secure Booking' },
+                { icon: 'M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z', label: 'Instant Tickets' },
+              ].map((badge) => (
+                <div key={badge.label} className="flex items-center gap-2 text-primary-100">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d={badge.icon} />
+                  </svg>
+                  <span className="text-sm font-medium">{badge.label}</span>
                 </div>
               ))}
             </div>

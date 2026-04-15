@@ -172,7 +172,12 @@ const Navbar = () => {
                         </div>
 
                         {isAttendee && <DropdownLink to="/tickets">My Tickets</DropdownLink>}
-                        {isOrganizer && <DropdownLink to="/organizer">Dashboard</DropdownLink>}
+                        {isOrganizer && (
+                          <>
+                            <DropdownLink to="/organizer">Dashboard</DropdownLink>
+                            <DropdownLink to="/organizer/events/create">Create Event</DropdownLink>
+                          </>
+                        )}
                         {isAdmin && <DropdownLink to="/admin">Admin Panel</DropdownLink>}
                         <DropdownLink to="/settings">Settings</DropdownLink>
 
