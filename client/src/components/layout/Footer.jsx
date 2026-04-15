@@ -81,9 +81,29 @@ const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800">
+        <div className="mt-10 pt-6 border-t border-gray-200 dark:border-gray-800 flex flex-col items-center gap-2">
           <p className="text-center text-sm text-gray-400 dark:text-gray-500">
             &copy; {currentYear} EventBooking. All rights reserved.
+          </p>
+          <p className="text-center text-sm text-gray-400 dark:text-gray-500">
+            Created by{' '}
+            <a
+              href="https://serkanbayraktar.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 dark:text-primary-400 hover:underline transition-colors"
+            >
+              Serkanby
+            </a>
+            {' | '}
+            <a
+              href="https://github.com/Serkanbyx"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-600 dark:text-primary-400 hover:underline transition-colors"
+            >
+              Github
+            </a>
           </p>
         </div>
       </div>
