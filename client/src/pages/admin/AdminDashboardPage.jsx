@@ -137,7 +137,10 @@ const AdminDashboardPage = () => {
           attended: raw.registrations?.byStatus?.attended || 0,
           newUsersThisMonth: raw.users?.newThisMonth || 0,
           newEventsThisMonth: raw.events?.newThisMonth || 0,
-          revenueEstimate: 0,
+          revenueEstimate: (raw.topEvents || []).reduce(
+            (sum, e) => sum + ((e.price || 0) * (e.registeredCount || 0)),
+            0
+          ),
         };
 
         setData({

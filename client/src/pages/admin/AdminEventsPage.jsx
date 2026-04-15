@@ -38,6 +38,18 @@ const CATEGORY_COLORS = {
   webinar: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200',
 };
 
+const STATUS_TRANSITIONS = {
+  draft: ['published', 'cancelled'],
+  published: ['cancelled', 'completed'],
+  cancelled: [],
+  completed: [],
+};
+
+const getValidTransitions = (currentStatus) => {
+  const transitions = STATUS_TRANSITIONS[currentStatus] || [];
+  return transitions.length > 0 ? [currentStatus, ...transitions] : [currentStatus];
+};
+
 const LIMIT = 10;
 
 const AdminEventsPage = () => {
@@ -329,10 +341,9 @@ const AdminEventsPage = () => {
                          border border-gray-300 dark:border-gray-600 rounded-lg
                          focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="completed">Completed</option>
+              {getValidTransitions(statusModal.status?.toLowerCase()).map((s) => (
+                <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
+              ))}
             </select>
 
             <div className="flex gap-3 mt-6">

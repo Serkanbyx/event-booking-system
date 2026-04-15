@@ -64,6 +64,17 @@ const getAdminDashboard = async (req, res, next) => {
         Event.countDocuments({ createdAt: { $gte: startOfMonth } }),
 
         Event.aggregate([
+          { $sort: { registeredCount: -1 } },
+          { $limit: 5 },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'organizer',
+              foreignField: '_id',
+              as: 'organizerInfo',
+            },
+          },
+          { $unwind: { path: '$organizerInfo', preserveNullAndEmptyArrays: true } },
           {
             $project: {
               title: 1,
@@ -72,10 +83,13 @@ const getAdminDashboard = async (req, res, next) => {
               capacity: 1,
               status: 1,
               date: 1,
+              price: 1,
+              organizer: {
+                _id: '$organizerInfo._id',
+                name: '$organizerInfo.name',
+              },
             },
           },
-          { $sort: { registeredCount: -1 } },
-          { $limit: 5 },
         ]),
       ]);
 
