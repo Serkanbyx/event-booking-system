@@ -213,7 +213,7 @@ const AdminUsersPage = () => {
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
+          <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-visible">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
@@ -243,7 +243,7 @@ const AdminUsersPage = () => {
                   const stat = getUserStat(user);
 
                   return (
-                    <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                    <tr key={user._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           {avatar ? (
@@ -446,7 +446,7 @@ const AdminUsersPage = () => {
 const UserActionsDropdown = ({ user, isOpen, onToggle, onChangeRole, onToggleActive, onDelete, isLoading, dropdownRef }) => (
   <div className="relative inline-block" ref={dropdownRef}>
     <button
-      onClick={onToggle}
+      onClick={(e) => { e.stopPropagation(); onToggle(); }}
       disabled={isLoading}
       className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200
                  hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"

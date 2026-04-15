@@ -25,20 +25,18 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const requestUrl = error.config?.url || '';
-    const isAuthRequest =
-      requestUrl.includes('/api/auth/login') ||
-      requestUrl.includes('/api/auth/register');
+    const isAuthEndpoint = requestUrl.includes('/api/auth/');
 
     if (error.response?.status === 401) {
-      if (!isAuthRequest) {
+      if (!isAuthEndpoint) {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/auth/login';
+        window.dispatchEvent(new CustomEvent('auth:session-expired'));
       }
       return Promise.reject(error);
     }
 
-    if (isAuthRequest) {
+    if (isAuthEndpoint) {
       return Promise.reject(error);
     }
 

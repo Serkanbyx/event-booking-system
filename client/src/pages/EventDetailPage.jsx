@@ -6,6 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { getEventBySlug, getEvents } from '../services/eventService';
 import { registerForEvent, cancelRegistration } from '../services/registrationService';
 import EventCard from '../components/ui/EventCard';
+import { formatCurrency } from '../utils/formatters';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const CATEGORY_COLORS = {
@@ -392,9 +393,7 @@ const EventDetailPage = () => {
                   <div>
                     <p className="text-sm text-gray-500 dark:text-gray-400">Price</p>
                     <p className="font-medium text-gray-900 dark:text-white">
-                      {!event.price || event.price === 0
-                        ? 'Free'
-                        : `$${event.price.toFixed(2)}${event.currency ? ` ${event.currency}` : ''}`}
+                      {formatCurrency(event.price || 0, event.currency || 'USD')}
                     </p>
                   </div>
                 </div>
@@ -410,11 +409,8 @@ const EventDetailPage = () => {
                 {/* Price Display */}
                 <div className="text-center mb-5">
                   <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {!event.price || event.price === 0 ? 'Free' : `$${event.price.toFixed(2)}`}
+                    {formatCurrency(event.price || 0, event.currency || 'USD')}
                   </p>
-                  {event.price > 0 && event.currency && (
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{event.currency}</p>
-                  )}
                 </div>
 
                 {/* Capacity Progress */}

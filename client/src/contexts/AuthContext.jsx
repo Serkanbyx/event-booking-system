@@ -18,10 +18,26 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Validate existing token on mount
+  // Handle forced logout from axios interceptor (401 on non-auth endpoints)
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setToken(null);
+      setUser(null);
+    };
+    window.addEventListener('auth:session-expired', handleSessionExpired);
+    return () => window.removeEventListener('auth:session-expired', handleSessionExpired);
+  }, []);
+
+  // Validate existing token on mount (skip if user already loaded via login/register)
   useEffect(() => {
     const verifyToken = async () => {
       if (!token) {
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      if (user) {
         setLoading(false);
         return;
       }
@@ -39,6 +55,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     verifyToken();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const login = useCallback(async (credentials) => {

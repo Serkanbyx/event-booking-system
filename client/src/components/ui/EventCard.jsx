@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { format, isPast } from 'date-fns';
+import { formatCurrency } from '../../utils/formatters';
 
 const CATEGORY_COLORS = {
   conference: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -41,6 +42,7 @@ const EventCard = ({ event }) => {
     venue: topVenue,
     city: topCity,
     price,
+    currency,
     capacity = 0,
     registeredCount = 0,
     image,
@@ -97,7 +99,7 @@ const EventCard = ({ event }) => {
 
         {/* Price Badge */}
         <span className="absolute top-3 right-3 px-2.5 py-1 text-xs font-bold rounded-full bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white shadow-sm">
-          {price === 0 || !price ? 'Free' : `$${price}`}
+          {formatCurrency(price || 0, currency || 'USD')}
         </span>
 
         {/* Sold Out Overlay */}
