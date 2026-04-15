@@ -19,6 +19,9 @@ const { verifyConnection } = require('./utils/emailService');
 
 const app = express();
 
+// Trust first proxy (Render, Heroku, etc.) so express-rate-limit reads real client IP
+app.set('trust proxy', 1);
+
 // Disable x-powered-by header
 app.disable('x-powered-by');
 

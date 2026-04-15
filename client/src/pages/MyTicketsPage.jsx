@@ -47,7 +47,7 @@ const MyTicketsPage = () => {
   const fetchRegistrations = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await getMyRegistrations({ limit: 100 });
+      const response = await getMyRegistrations({ limit: 50 });
       const data = response.data?.registrations || response.registrations || [];
       setRegistrations(data);
     } catch {

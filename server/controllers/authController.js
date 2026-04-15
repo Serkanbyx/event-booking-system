@@ -131,7 +131,7 @@ const updateProfile = async (req, res, next) => {
     if (preferences !== undefined) updateFields.preferences = preferences;
 
     const user = await User.findByIdAndUpdate(req.user._id, updateFields, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true,
     });
 
