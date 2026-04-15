@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
 
       try {
         const response = await authService.getMe();
-        setUser(response.data);
+        setUser(response.data?.user || response.data);
       } catch {
         localStorage.removeItem('token');
         setToken(null);

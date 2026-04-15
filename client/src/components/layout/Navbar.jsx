@@ -190,13 +190,13 @@ const Navbar = () => {
                 ) : (
                   <>
                     <Link
-                      to="/login"
+                      to="/auth/login"
                       className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white transition-colors"
                     >
                       Login
                     </Link>
                     <Link
-                      to="/register"
+                      to="/auth/register"
                       className="px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
                     >
                       Sign Up
@@ -290,13 +290,13 @@ const Navbar = () => {
           ) : (
             <div className="space-y-2">
               <Link
-                to="/login"
+                to="/auth/login"
                 className="block w-full text-center px-4 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-800 transition-colors"
               >
                 Login
               </Link>
               <Link
-                to="/register"
+                to="/auth/register"
                 className="block w-full text-center px-4 py-2.5 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg transition-colors"
               >
                 Sign Up

@@ -60,7 +60,8 @@ const EventListPage = () => {
     const fetchCategories = async () => {
       try {
         const res = await getCategories();
-        setCategories(res.data || res || []);
+        const catData = res.data?.categories || res.data || res || [];
+        setCategories(Array.isArray(catData) ? catData : []);
       } catch {
         /* Categories are not critical */
       }
@@ -127,9 +128,10 @@ const EventListPage = () => {
         if (filters.upcoming) params.upcoming = true;
 
         const res = await getEvents(params);
-        setEvents(res.data || res.events || []);
-        setTotalEvents(res.total || res.totalEvents || 0);
-        setTotalPages(res.totalPages || Math.ceil((res.total || 0) / ITEMS_PER_PAGE) || 1);
+        const responseData = res.data || res;
+        setEvents(responseData.events || []);
+        setTotalEvents(responseData.total || 0);
+        setTotalPages(responseData.totalPages || Math.ceil((responseData.total || 0) / ITEMS_PER_PAGE) || 1);
       } catch {
         setEvents([]);
         setTotalEvents(0);

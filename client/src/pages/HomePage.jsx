@@ -132,11 +132,13 @@ const HomePage = () => {
         ]);
 
         if (eventsRes.status === 'fulfilled') {
-          setFeaturedEvents(eventsRes.value.data || eventsRes.value || []);
+          const eventsData = eventsRes.value.data?.events || eventsRes.value.data || eventsRes.value || [];
+          setFeaturedEvents(Array.isArray(eventsData) ? eventsData : []);
         }
 
         if (categoriesRes.status === 'fulfilled') {
-          const catData = categoriesRes.value.data || categoriesRes.value || [];
+          const rawCat = categoriesRes.value.data?.categories || categoriesRes.value.data || categoriesRes.value || [];
+          const catData = Array.isArray(rawCat) ? rawCat : [];
           if (catData.length > 0) setCategories(catData);
         }
       } catch {
