@@ -10,7 +10,7 @@ const SORT_OPTIONS = [
   { value: '-date', label: 'Date (Latest)' },
   { value: 'price', label: 'Price (Low to High)' },
   { value: '-price', label: 'Price (High to Low)' },
-  { value: 'newest', label: 'Newest' },
+  { value: 'createdAt', label: 'Newest' },
 ];
 
 const ITEMS_PER_PAGE = 9;
@@ -60,8 +60,14 @@ const EventListPage = () => {
     const fetchCategories = async () => {
       try {
         const res = await getCategories();
-        const catData = res.data?.categories || res.data || res || [];
-        setCategories(Array.isArray(catData) ? catData : []);
+        const rawCat = res.data?.categories || res.data || res || [];
+        const catArr = Array.isArray(rawCat) ? rawCat : [];
+        const normalized = catArr.map((c) => ({
+          name: c.name || (c.category ? c.category.charAt(0).toUpperCase() + c.category.slice(1) : ''),
+          slug: c.slug || c.category || '',
+          eventCount: c.eventCount ?? c.count ?? 0,
+        }));
+        setCategories(normalized);
       } catch {
         /* Categories are not critical */
       }

@@ -141,7 +141,7 @@ const HomePage = () => {
           const catData = Array.isArray(rawCat) ? rawCat : [];
           if (catData.length > 0) {
             const normalized = catData.map((c) => ({
-              name: c.name || c.category?.charAt(0).toUpperCase() + c.category?.slice(1) || '',
+              name: c.name || (c.category ? c.category.charAt(0).toUpperCase() + c.category.slice(1) : ''),
               slug: c.slug || c.category || '',
               eventCount: c.eventCount ?? c.count ?? 0,
             }));

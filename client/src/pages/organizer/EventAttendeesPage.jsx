@@ -50,7 +50,7 @@ const EventAttendeesPage = () => {
       const response = await eventService.getEventRegistrations(eventId, params);
       const data = response.data || response;
       setRegistrations(data.registrations || []);
-      setTotalPages(data.totalPages || 1);
+      setTotalPages(data.pagination?.pages || data.totalPages || 1);
     } catch {
       toast.error('Failed to load attendees');
     }
@@ -60,7 +60,7 @@ const EventAttendeesPage = () => {
     try {
       const response = await eventService.getEventStats(eventId);
       const data = response.data || response;
-      setStats(data);
+      setStats(data.stats || data);
       if (data.event) setEvent(data.event);
     } catch {
       toast.error('Failed to load event stats');
@@ -146,9 +146,9 @@ const EventAttendeesPage = () => {
   if (loading) return <PageSkeleton />;
 
   const totalRegistrations = stats?.totalRegistrations || 0;
-  const confirmedCount = stats?.confirmed || 0;
-  const cancelledCount = stats?.cancelled || 0;
-  const attendedCount = stats?.attended || 0;
+  const confirmedCount = stats?.confirmedCount || stats?.confirmed || 0;
+  const cancelledCount = stats?.cancelledCount || stats?.cancelled || 0;
+  const attendedCount = stats?.attendedCount || stats?.attended || 0;
   const capacity = stats?.event?.capacity || event?.capacity || 0;
   const filledSpots = confirmedCount + attendedCount;
   const fillPercentage = capacity > 0 ? Math.round((filledSpots / capacity) * 100) : 0;

@@ -329,8 +329,8 @@ const PasswordSection = () => {
 const NotificationsSection = ({ user, updateUser }) => {
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
-    registrationConfirmations: true,
-    eventReminders: true,
+    registrationAlerts: true,
+    reminderEmails: true,
   });
   const debounceRef = useRef(null);
 
@@ -338,8 +338,8 @@ const NotificationsSection = ({ user, updateUser }) => {
     if (user?.preferences) {
       setPreferences({
         emailNotifications: user.preferences.emailNotifications ?? true,
-        registrationConfirmations: user.preferences.registrationConfirmations ?? true,
-        eventReminders: user.preferences.eventReminders ?? true,
+        registrationAlerts: user.preferences.registrationAlerts ?? true,
+        reminderEmails: user.preferences.reminderEmails ?? true,
       });
     }
   }, [user]);
@@ -365,8 +365,8 @@ const NotificationsSection = ({ user, updateUser }) => {
 
   const toggleItems = [
     { key: 'emailNotifications', label: 'Email Notifications', desc: 'Receive important updates and announcements via email' },
-    { key: 'registrationConfirmations', label: 'Registration Confirmations', desc: 'Get notified when you register for an event' },
-    { key: 'eventReminders', label: 'Event Reminders', desc: 'Receive reminders before your upcoming events' },
+    { key: 'registrationAlerts', label: 'Registration Alerts', desc: 'Get notified when you register for an event' },
+    { key: 'reminderEmails', label: 'Event Reminders', desc: 'Receive reminders before your upcoming events' },
   ];
 
   return (

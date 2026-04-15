@@ -324,6 +324,13 @@ const getEventBySlug = async (req, res, next) => {
           status: { $ne: 'cancelled' },
         });
         response.isRegistered = !!existingRegistration;
+        if (existingRegistration) {
+          response.userRegistration = {
+            _id: existingRegistration._id,
+            status: existingRegistration.status,
+            confirmationCode: existingRegistration.confirmationCode,
+          };
+        }
       }
     }
 

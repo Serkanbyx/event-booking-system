@@ -130,7 +130,7 @@ const EventForm = ({ initialData = null, onSubmit, isEditing = false, isLoading 
 
     if (!formData.date) {
       newErrors.date = 'Event date is required';
-    } else if (new Date(formData.date) < new Date(new Date().toDateString())) {
+    } else if (!isEditing && new Date(formData.date) < new Date(new Date().toDateString())) {
       newErrors.date = 'Event date must be in the future';
     }
 

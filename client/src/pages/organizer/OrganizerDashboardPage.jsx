@@ -21,7 +21,7 @@ const STAT_CARDS = [
     format: (val) => val ?? 0,
   },
   {
-    key: 'totalRegistrations',
+    key: 'totalRegistered',
     label: 'Total Registrations',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -33,7 +33,7 @@ const STAT_CARDS = [
     format: (val) => val ?? 0,
   },
   {
-    key: 'estimatedRevenue',
+    key: 'totalRevenue',
     label: 'Estimated Revenue',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -45,8 +45,8 @@ const STAT_CARDS = [
     format: (val) => `$${(val ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
   },
   {
-    key: 'avgCapacity',
-    label: 'Avg. Capacity',
+    key: 'capacityUtilization',
+    label: 'Capacity Usage',
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}

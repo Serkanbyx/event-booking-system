@@ -30,10 +30,9 @@ const registerForEvent = async (req, res, next) => {
     const existingRegistration = await Registration.findOne({
       user: userId,
       event: eventId,
-      status: 'confirmed',
     });
 
-    if (existingRegistration) {
+    if (existingRegistration && existingRegistration.status === 'confirmed') {
       throw new AppError('You are already registered for this event', 400);
     }
 
@@ -52,12 +51,29 @@ const registerForEvent = async (req, res, next) => {
       throw new AppError('Event is full, no spots available', 400);
     }
 
-    const registration = await Registration.create({
-      user: userId,
-      event: eventId,
-      ticketType: req.body.ticketType || 'standard',
-      notes: req.body.notes || '',
-    });
+    let registration;
+    try {
+      if (existingRegistration && existingRegistration.status === 'cancelled') {
+        existingRegistration.status = 'confirmed';
+        existingRegistration.ticketType = req.body.ticketType || 'standard';
+        existingRegistration.notes = req.body.notes || '';
+        existingRegistration.registeredAt = new Date();
+        registration = await existingRegistration.save();
+      } else {
+        registration = await Registration.create({
+          user: userId,
+          event: eventId,
+          ticketType: req.body.ticketType || 'standard',
+          notes: req.body.notes || '',
+        });
+      }
+    } catch (regError) {
+      await Event.findOneAndUpdate(
+        { _id: eventId, registeredCount: { $gt: 0 } },
+        { $inc: { registeredCount: -1 } }
+      );
+      throw regError;
+    }
 
     await registration.populate('event', 'title slug date time location image status organizer');
 
@@ -111,10 +127,11 @@ const cancelRegistration = async (req, res, next) => {
     registration.cancelledAt = new Date();
     await registration.save();
 
-    // Atomic decrement — keeps registeredCount consistent
-    await Event.findByIdAndUpdate(registration.event, {
-      $inc: { registeredCount: -1 },
-    });
+    // Atomic decrement with floor at 0
+    await Event.findOneAndUpdate(
+      { _id: registration.event, registeredCount: { $gt: 0 } },
+      { $inc: { registeredCount: -1 } }
+    );
 
     const event = await Event.findById(registration.event).select(
       'title date location'

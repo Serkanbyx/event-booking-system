@@ -80,8 +80,14 @@ const LoginPage = () => {
       toast.success('Welcome back!');
       navigate(from, { replace: true });
     } catch (error) {
-      const message =
-        error.response?.data?.message || 'Login failed. Please try again.';
+      const data = error.response?.data;
+      let message = data?.message || error.message || 'Login failed. Please try again.';
+      if (data?.errors) {
+        const msgs = Array.isArray(data.errors)
+          ? data.errors.map((e) => (typeof e === 'object' ? e.message || e.msg : e))
+          : [data.errors];
+        message = msgs.join(', ');
+      }
       setApiError(message);
     } finally {
       setIsSubmitting(false);

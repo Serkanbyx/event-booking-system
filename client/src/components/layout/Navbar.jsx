@@ -96,7 +96,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: '/events', label: 'Events', visible: true },
-    { to: '/tickets', label: 'My Tickets', visible: isAuthenticated && isAttendee },
+    { to: '/tickets', label: 'My Tickets', visible: isAuthenticated },
     { to: '/organizer', label: 'Dashboard', visible: isOrganizer },
     { to: '/admin', label: 'Admin', visible: isAdmin },
     { to: '/organizer/events/create', label: 'Create Event', visible: isOrganizer },

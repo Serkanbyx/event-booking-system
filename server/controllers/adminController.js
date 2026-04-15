@@ -130,7 +130,7 @@ const getAdminDashboard = async (req, res, next) => {
 // @access  Admin
 const getAllUsers = async (req, res, next) => {
   try {
-    const { search, role, page = 1, limit = 20 } = req.query;
+    const { search, role, active, page = 1, limit = 20 } = req.query;
 
     const filter = {};
 
@@ -141,6 +141,12 @@ const getAllUsers = async (req, res, next) => {
 
     if (role && VALID_ROLES.includes(role)) {
       filter.role = role;
+    }
+
+    if (active === 'true') {
+      filter.isActive = true;
+    } else if (active === 'false') {
+      filter.isActive = false;
     }
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
@@ -293,7 +299,7 @@ const deleteUser = async (req, res, next) => {
 // @access  Admin
 const getAllEvents = async (req, res, next) => {
   try {
-    const { search, status, organizer, page = 1, limit = 20 } = req.query;
+    const { search, status, category, organizer, page = 1, limit = 20 } = req.query;
 
     const filter = {};
 
@@ -304,6 +310,10 @@ const getAllEvents = async (req, res, next) => {
 
     if (status && VALID_EVENT_STATUSES.includes(status)) {
       filter.status = status;
+    }
+
+    if (category) {
+      filter.category = category;
     }
 
     if (organizer && mongoose.Types.ObjectId.isValid(organizer)) {
@@ -408,9 +418,14 @@ const adminDeleteEvent = async (req, res, next) => {
 // @access  Admin
 const getAllRegistrations = async (req, res, next) => {
   try {
-    const { event, user, status, page = 1, limit = 20 } = req.query;
+    const { search, event, user, status, page = 1, limit = 20 } = req.query;
 
     const filter = {};
+
+    if (search) {
+      const searchRegex = new RegExp(escapeRegex(search), 'i');
+      filter.confirmationCode = searchRegex;
+    }
 
     if (event && mongoose.Types.ObjectId.isValid(event)) {
       filter.event = event;

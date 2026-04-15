@@ -25,6 +25,7 @@ const TicketDetailPage = () => {
 
   const [registration, setRegistration] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -44,6 +45,7 @@ const TicketDetailPage = () => {
       if (err.response?.status === 404) {
         setNotFound(true);
       } else {
+        setFetchError(true);
         toast.error('Failed to load ticket details.');
       }
     } finally {
@@ -104,6 +106,27 @@ const TicketDetailPage = () => {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center px-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+            Something went wrong
+          </h2>
+          <p className="mt-2 text-gray-600 dark:text-gray-400">
+            Failed to load ticket details. Please try again.
+          </p>
+          <button
+            onClick={() => { setFetchError(false); fetchRegistration(); }}
+            className="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors"
+          >
+            Try Again
+          </button>
         </div>
       </div>
     );

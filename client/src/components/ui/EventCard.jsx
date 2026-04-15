@@ -30,6 +30,8 @@ const getCapacityColor = (percentage) => {
 const EventCard = ({ event }) => {
   const navigate = useNavigate();
 
+  if (!event) return null;
+
   const {
     title,
     slug,
@@ -39,7 +41,7 @@ const EventCard = ({ event }) => {
     venue: topVenue,
     city: topCity,
     price,
-    capacity,
+    capacity = 0,
     registeredCount = 0,
     image,
   } = event;
@@ -47,9 +49,9 @@ const EventCard = ({ event }) => {
   const venue = location?.venue || topVenue;
   const city = location?.city || topCity;
 
-  const eventDate = new Date(date);
-  const isEventPast = isPast(eventDate);
-  const isFull = registeredCount >= capacity;
+  const eventDate = date ? new Date(date) : null;
+  const isEventPast = eventDate ? isPast(eventDate) : false;
+  const isFull = capacity > 0 && registeredCount >= capacity;
   const spotsLeft = capacity - registeredCount;
   const capacityPercentage = capacity > 0 ? (registeredCount / capacity) * 100 : 0;
 
@@ -58,7 +60,7 @@ const EventCard = ({ event }) => {
   const categoryColor = CATEGORY_COLORS[categoryKey] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
 
   const handleClick = () => {
-    navigate(`/events/${slug}`);
+    if (slug) navigate(`/events/${slug}`);
   };
 
   return (
@@ -129,7 +131,7 @@ const EventCard = ({ event }) => {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
           </svg>
-          <span>{format(eventDate, 'EEE, MMM dd, yyyy')}</span>
+          <span>{eventDate ? format(eventDate, 'EEE, MMM dd, yyyy') : 'Date TBD'}</span>
         </div>
 
         {/* Location */}

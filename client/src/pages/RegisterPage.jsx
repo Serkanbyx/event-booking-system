@@ -151,7 +151,8 @@ const RegisterPage = () => {
 
       if (data?.errors) {
         if (Array.isArray(data.errors)) {
-          setApiError(data.errors.join(', '));
+          const messages = data.errors.map((e) => (typeof e === 'object' ? e.message || e.msg || JSON.stringify(e) : e));
+          setApiError(messages.join(', '));
         } else if (typeof data.errors === 'object') {
           const fieldErrors = {};
           for (const [key, value] of Object.entries(data.errors)) {
