@@ -1,6 +1,8 @@
 const express = require('express');
 const { protect, organizerOnly } = require('../middlewares/auth');
 const { registrationLimiter } = require('../middlewares/rateLimiter');
+const validate = require('../middlewares/validate');
+const { paginationRules } = require('../validators/queryValidator');
 const {
   cancelRegistration,
   getMyRegistrations,
@@ -12,7 +14,7 @@ const {
 const router = express.Router();
 
 // Specific paths BEFORE :id param route
-router.get('/my', protect, getMyRegistrations);
+router.get('/my', protect, paginationRules, validate, getMyRegistrations);
 router.get('/code/:code', protect, registrationLimiter, getRegistrationByCode);
 
 // Check-in (organizer/admin)
