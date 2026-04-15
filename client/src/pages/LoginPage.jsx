@@ -44,16 +44,28 @@ const LoginPage = () => {
     if (apiError) setApiError('');
   };
 
-  const validate = () => {
+  const syncAutofill = () => {
+    const emailEl = document.getElementById('email');
+    const passwordEl = document.getElementById('password');
+    const updates = {};
+    if (emailEl && emailEl.value !== formData.email) updates.email = emailEl.value;
+    if (passwordEl && passwordEl.value !== formData.password) updates.password = passwordEl.value;
+    if (Object.keys(updates).length > 0) {
+      setFormData((prev) => ({ ...prev, ...updates }));
+    }
+    return { ...formData, ...updates };
+  };
+
+  const validate = (data) => {
     const newErrors = {};
 
-    if (!formData.email.trim()) {
+    if (!data.email.trim()) {
       newErrors.email = 'Email is required';
-    } else if (!EMAIL_REGEX.test(formData.email)) {
+    } else if (!EMAIL_REGEX.test(data.email)) {
       newErrors.email = 'Please enter a valid email address';
     }
 
-    if (!formData.password) {
+    if (!data.password) {
       newErrors.password = 'Password is required';
     }
 
@@ -63,16 +75,17 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    const currentData = syncAutofill();
+    if (!validate(currentData)) return;
 
     setIsSubmitting(true);
     setApiError('');
 
     try {
-      await login({ email: formData.email, password: formData.password });
+      await login({ email: currentData.email, password: currentData.password });
 
-      if (formData.rememberMe) {
-        localStorage.setItem('rememberedEmail', formData.email);
+      if (currentData.rememberMe) {
+        localStorage.setItem('rememberedEmail', currentData.email);
       } else {
         localStorage.removeItem('rememberedEmail');
       }
@@ -167,7 +180,7 @@ const LoginPage = () => {
                       ? 'border-danger-500 focus:ring-danger-500/40 focus:border-danger-500'
                       : 'border-gray-300 dark:border-gray-600'
                   }`}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                 />
                 <button
                   type="button"

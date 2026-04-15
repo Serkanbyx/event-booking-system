@@ -57,10 +57,10 @@ export const ThemeProvider = ({ children }) => {
     setThemeState(newTheme);
   }, []);
 
-  // Cycle: light → dark → system
+  // Cycle: dark → light → system → dark
   const toggleTheme = useCallback(() => {
     setThemeState((prev) => {
-      const cycle = { light: 'dark', dark: 'system', system: 'light' };
+      const cycle = { dark: 'light', light: 'system', system: 'dark' };
       const next = cycle[prev];
       localStorage.setItem(THEME_KEY, next);
       return next;

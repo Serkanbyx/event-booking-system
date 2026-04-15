@@ -56,7 +56,12 @@ const login = async (req, res, next) => {
 
     // Account lockout check
     if (user && user.lockUntil && user.lockUntil > Date.now()) {
-      throw new AppError('Account temporarily locked. Try again later.', 423);
+      const remainingMs = user.lockUntil - Date.now();
+      const remainingMin = Math.ceil(remainingMs / 60000);
+      throw new AppError(
+        `Account temporarily locked. Try again in ${remainingMin} minute${remainingMin > 1 ? 's' : ''}.`,
+        423
+      );
     }
 
     const isPasswordValid = user

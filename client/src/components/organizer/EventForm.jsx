@@ -87,7 +87,9 @@ const EventForm = ({ initialData = null, onSubmit, isEditing = false, isLoading 
 
   const handleNumberChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value === '' ? '' : Number(value) }));
+    const numValue = value === '' ? '' : Number(value);
+    if ((name === 'price' || name === 'capacity') && numValue !== '' && numValue < 0) return;
+    setFormData((prev) => ({ ...prev, [name]: numValue }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 

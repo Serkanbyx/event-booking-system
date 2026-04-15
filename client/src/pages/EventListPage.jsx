@@ -151,6 +151,9 @@ const EventListPage = () => {
   }, [filters]);
 
   const handleFilterChange = useCallback((key, value) => {
+    if ((key === 'priceMin' || key === 'priceMax') && value !== '' && Number(value) < 0) {
+      value = '0';
+    }
     updateFilters({ [key]: value, page: 1 });
   }, [updateFilters]);
 

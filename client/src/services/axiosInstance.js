@@ -45,7 +45,9 @@ axiosInstance.interceptors.response.use(
       error.response?.data?.errors?.join(', ') ||
       'An unexpected error occurred';
 
-    return Promise.reject(new Error(message));
+    const enhancedError = new Error(message);
+    if (error.response) enhancedError.response = error.response;
+    return Promise.reject(enhancedError);
   }
 );
 
