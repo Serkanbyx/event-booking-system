@@ -7,8 +7,11 @@ const cors = require('cors');
 const morgan = require('morgan');
 const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 const env = require('./config/env');
+const { version } = require('./package.json');
 const connectDB = require('./config/db');
 const { globalLimiter } = require('./middlewares/rateLimiter');
 const errorHandler = require('./middlewares/errorHandler');
@@ -79,6 +82,137 @@ app.use(
     index: false,
   })
 );
+
+// Swagger API Documentation
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Event Booking System — API Docs',
+  })
+);
+
+// Root welcome page
+app.get('/', (_req, res) => {
+  res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Booking System API</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      min-height:100vh;display:flex;align-items:center;justify-content:center;
+      font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+      background:#0f0e17;color:#fffffe;overflow:hidden;
+    }
+    body::before{
+      content:'';position:fixed;inset:0;z-index:0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 30%,rgba(255,61,113,.12) 0%,transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 70%,rgba(114,9,183,.15) 0%,transparent 70%),
+        radial-gradient(ellipse 40% 40% at 50% 50%,rgba(72,149,239,.08) 0%,transparent 70%);
+    }
+    body::after{
+      content:'';position:fixed;inset:0;z-index:0;
+      background:
+        repeating-linear-gradient(90deg,rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,transparent 1px,transparent 80px),
+        repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0px,rgba(255,255,255,.015) 1px,transparent 1px,transparent 80px);
+    }
+    .container{
+      position:relative;z-index:1;text-align:center;padding:3rem 2rem;
+      max-width:520px;width:100%;
+    }
+    .ticket-icon{
+      display:inline-block;margin-bottom:1.5rem;position:relative;
+      width:80px;height:52px;
+      background:linear-gradient(135deg,#ff3d71,#7209b7);
+      border-radius:8px;transform:rotate(-6deg);
+      box-shadow:0 8px 32px rgba(255,61,113,.25);
+    }
+    .ticket-icon::before,.ticket-icon::after{
+      content:'';position:absolute;width:14px;height:14px;
+      background:#0f0e17;border-radius:50%;top:50%;transform:translateY(-50%);
+    }
+    .ticket-icon::before{left:-7px}
+    .ticket-icon::after{right:-7px}
+    .ticket-icon span{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(6deg);
+      font-size:.85rem;font-weight:700;letter-spacing:1px;color:#fffffe;
+    }
+    h1{
+      font-size:2.2rem;font-weight:800;letter-spacing:-0.5px;
+      background:linear-gradient(135deg,#fffffe 0%,#ff3d71 50%,#7209b7 100%);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+      background-clip:text;margin-bottom:.5rem;line-height:1.2;
+    }
+    .version{
+      font-size:.85rem;color:rgba(255,255,255,.4);letter-spacing:2px;
+      font-weight:500;margin-bottom:2.5rem;text-transform:uppercase;
+    }
+    .links{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2.5rem}
+    .btn{
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:.85rem 1.5rem;border-radius:12px;text-decoration:none;
+      font-size:.95rem;font-weight:600;letter-spacing:.3px;
+      transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,#ff3d71,#7209b7);color:#fffffe;
+      box-shadow:0 4px 20px rgba(255,61,113,.3);
+    }
+    .btn-primary:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 30px rgba(255,61,113,.45);
+    }
+    .btn-secondary{
+      background:rgba(255,255,255,.06);color:rgba(255,255,255,.8);
+      border:1px solid rgba(255,255,255,.08);
+      backdrop-filter:blur(10px);
+    }
+    .btn-secondary:hover{
+      background:rgba(255,255,255,.1);
+      border-color:rgba(255,61,113,.3);color:#fffffe;
+      transform:translateY(-2px);
+    }
+    .sign{
+      font-size:.8rem;color:rgba(255,255,255,.3);
+      padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.06);
+    }
+    .sign a{
+      color:rgba(255,61,113,.7);text-decoration:none;
+      transition:color .2s ease;
+    }
+    .sign a:hover{color:#ff3d71}
+    @media(max-width:480px){
+      h1{font-size:1.6rem}
+      .container{padding:2rem 1.25rem}
+      .ticket-icon{width:64px;height:42px}
+      .ticket-icon span{font-size:.7rem}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="ticket-icon"><span>TICKET</span></div>
+    <h1>Event Booking System</h1>
+    <p class="version">v${version}</p>
+    <div class="links">
+      <a href="/api-docs" class="btn btn-primary">API Documentation</a>
+      <a href="/api/health" class="btn btn-secondary">Health Check</a>
+    </div>
+    <footer class="sign">
+      Created by
+      <a href="https://serkanbayraktar.com/" target="_blank" rel="noopener noreferrer">Serkanby</a>
+      |
+      <a href="https://github.com/Serkanbyx" target="_blank" rel="noopener noreferrer">Github</a>
+    </footer>
+  </div>
+</body>
+</html>`);
+});
 
 // Health check
 app.get('/api/health', (_req, res) => {

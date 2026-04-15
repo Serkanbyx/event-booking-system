@@ -67,6 +67,7 @@ A full-stack event booking platform built with the **MERN** stack (MongoDB, Expr
 - **express-validator** — Declarative input validation and sanitization
 - **express-mongo-sanitize** — NoSQL injection prevention
 - **Morgan** — HTTP request logging
+- **swagger-jsdoc + swagger-ui-express** — Interactive API documentation with Swagger/OpenAPI 3.0
 
 ---
 
@@ -298,6 +299,14 @@ Client (React + Vite)         Server (Express + MongoDB)
 
 > Auth endpoints require `Authorization: Bearer <token>` header. Rate limits apply per tier: global (100/15min), auth (10/15min), registration (20/15min), upload (10/15min).
 
+### API Documentation (Swagger)
+
+Interactive API documentation is available at `/api-docs` when the server is running:
+
+- **Local:** [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+- Provides a complete OpenAPI 3.0 specification with all endpoints, request/response schemas, and authentication details
+- Test API endpoints directly from the browser with the built-in "Try it out" feature
+
 ---
 
 ## Project Structure
@@ -522,20 +531,14 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Developer
 
-**Serkan Bayraktar**
+**Serkanby**
 
-- 🌐 [serkanbayraktar.com](https://serkanbayraktar.com/)
-- 🐙 [@Serkanbyx](https://github.com/Serkanbyx)
-- 📧 serkanbyx1@gmail.com
-
----
+- Website: [serkanbayraktar.com](https://serkanbayraktar.com/)
+- GitHub: [@Serkanbyx](https://github.com/Serkanbyx)
+- Email: [serkanbyx1@gmail.com](mailto:serkanbyx1@gmail.com)
 
 ## Contact
 
-- 🐛 [Report a Bug](https://github.com/Serkanbyx/event-booking-system/issues)
-- 📧 serkanbyx1@gmail.com
-- 🌐 [serkanbayraktar.com](https://serkanbayraktar.com/)
-
----
-
-⭐ If you like this project, don't forget to give it a star!
+- [Open an Issue](https://github.com/Serkanbyx/event-booking-system/issues)
+- Email: [serkanbyx1@gmail.com](mailto:serkanbyx1@gmail.com)
+- Website: [serkanbayraktar.com](https://serkanbayraktar.com/)

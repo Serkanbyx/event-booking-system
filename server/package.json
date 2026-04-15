@@ -9,7 +9,10 @@
     "seed": "node utils/seed.js"
   },
   "keywords": [],
-  "author": "",
+  "author": {
+    "name": "Serkanby",
+    "url": "https://serkanbayraktar.com/"
+  },
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
@@ -28,6 +31,8 @@
     "multer": "^2.1.1",
     "nodemailer": "^8.0.5",
     "slugify": "^1.6.9",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
