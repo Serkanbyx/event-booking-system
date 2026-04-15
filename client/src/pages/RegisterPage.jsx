@@ -111,6 +111,8 @@ const RegisterPage = () => {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
     }
 
     if (!formData.confirmPassword) {
@@ -147,14 +149,18 @@ const RegisterPage = () => {
     } catch (error) {
       const data = error.response?.data;
 
-      if (data?.errors && typeof data.errors === 'object') {
-        const fieldErrors = {};
-        for (const [key, value] of Object.entries(data.errors)) {
-          fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+      if (data?.errors) {
+        if (Array.isArray(data.errors)) {
+          setApiError(data.errors.join(', '));
+        } else if (typeof data.errors === 'object') {
+          const fieldErrors = {};
+          for (const [key, value] of Object.entries(data.errors)) {
+            fieldErrors[key] = Array.isArray(value) ? value[0] : value;
+          }
+          setErrors(fieldErrors);
         }
-        setErrors(fieldErrors);
       } else {
-        setApiError(data?.message || 'Registration failed. Please try again.');
+        setApiError(data?.message || error.message || 'Registration failed. Please try again.');
       }
     } finally {
       setIsSubmitting(false);

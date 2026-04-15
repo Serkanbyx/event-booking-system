@@ -80,16 +80,16 @@ const EventDetailPage = () => {
       }
       setEvent(eventObj);
 
-      if (eventData.category) {
+      if (eventObj.category) {
         try {
           const relatedRes = await getEvents({
-            category: eventData.category,
+            category: eventObj.category,
             limit: 5,
             status: 'published',
           });
           const allRelated = relatedRes.data?.events || relatedRes.data || relatedRes.events || [];
           setRelatedEvents(
-            allRelated.filter((e) => e._id !== eventData._id).slice(0, 4)
+            allRelated.filter((e) => e._id !== eventObj._id).slice(0, 4)
           );
         } catch {
           // Silently fail for related events
@@ -128,7 +128,12 @@ const EventDetailPage = () => {
   const categoryColor = CATEGORY_COLORS[categoryKey] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
   const gradientIndex = event?.title ? event.title.charCodeAt(0) % CATEGORY_GRADIENTS.length : 0;
 
-  const fullAddress = [event?.venue, event?.address, event?.city, event?.country]
+  const venue = event?.location?.venue || event?.venue;
+  const address = event?.location?.address || event?.address;
+  const city = event?.location?.city || event?.city;
+  const country = event?.location?.country || event?.country;
+
+  const fullAddress = [venue, address, city, country]
     .filter(Boolean)
     .join(', ');
   const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(fullAddress)}`;
@@ -257,7 +262,7 @@ const EventDetailPage = () => {
               </div>
 
               {/* Location */}
-              {(event.venue || event.city) && (
+              {(venue || city) && (
                 <div className="flex items-center gap-2">
                   <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -265,7 +270,7 @@ const EventDetailPage = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                       d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                   </svg>
-                  <span>{[event.venue, event.city, event.country].filter(Boolean).join(', ')}</span>
+                  <span>{[venue, city, country].filter(Boolean).join(', ')}</span>
                 </div>
               )}
             </div>
@@ -341,9 +346,9 @@ const EventDetailPage = () => {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500 dark:text-gray-400">Location</p>
-                      <p className="font-medium text-gray-900 dark:text-white">{event.venue}</p>
+                      <p className="font-medium text-gray-900 dark:text-white">{venue}</p>
                       <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {[event.address, event.city, event.country].filter(Boolean).join(', ')}
+                        {[address, city, country].filter(Boolean).join(', ')}
                       </p>
                       <a
                         href={mapsUrl}

@@ -6,10 +6,10 @@ import useDebounce from '../hooks/useDebounce';
 import useDocumentTitle from '../hooks/useDocumentTitle';
 
 const SORT_OPTIONS = [
-  { value: 'date_asc', label: 'Date (Soonest)' },
-  { value: 'date_desc', label: 'Date (Latest)' },
-  { value: 'price_asc', label: 'Price (Low to High)' },
-  { value: 'price_desc', label: 'Price (High to Low)' },
+  { value: 'date', label: 'Date (Soonest)' },
+  { value: '-date', label: 'Date (Latest)' },
+  { value: 'price', label: 'Price (Low to High)' },
+  { value: '-price', label: 'Price (High to Low)' },
   { value: 'newest', label: 'Newest' },
 ];
 
@@ -23,7 +23,7 @@ const DEFAULT_FILTERS = {
   dateTo: '',
   priceMin: '',
   priceMax: '',
-  sort: 'date_asc',
+  sort: 'date',
   upcoming: true,
   page: 1,
 };
