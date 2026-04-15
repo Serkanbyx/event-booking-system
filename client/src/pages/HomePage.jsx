@@ -365,7 +365,7 @@ const HomePage = () => {
                   <div className="text-center">
                     <div className="font-semibold text-sm sm:text-base">{cat.name}</div>
                     {cat.eventCount > 0 && (
-                      <div className="text-xs opacity-75 mt-0.5">{cat.eventCount} events</div>
+                      <div className="text-xs opacity-75 mt-0.5">{cat.eventCount} {cat.eventCount === 1 ? 'event' : 'events'}</div>
                     )}
                   </div>
                 </Link>

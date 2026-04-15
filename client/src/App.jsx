@@ -20,6 +20,7 @@ import EventDetailPage from './pages/EventDetailPage';
 import PublicProfilePage from './pages/PublicProfilePage';
 import AboutPage from './pages/AboutPage';
 import NotFoundPage from './pages/NotFoundPage';
+import TermsPage from './pages/TermsPage';
 
 // Auth Pages
 import LoginPage from './pages/LoginPage';
@@ -75,6 +76,7 @@ const App = () => {
           <Route path="events" element={<EventListPage />} />
           <Route path="events/:slug" element={<EventDetailPage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="terms" element={<TermsPage />} />
           <Route path="users/:id" element={<PublicProfilePage />} />
         </Route>
 
@@ -118,7 +120,9 @@ const App = () => {
         </Route>
 
         {/* 404 - Not Found */}
-        <Route path="*" element={<NotFoundPage />} />
+        <Route element={<MainLayout />}>
+          <Route path="*" element={<NotFoundPage />} />
+        </Route>
       </Routes>
     </>
   );

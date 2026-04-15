@@ -418,9 +418,9 @@ const RegisterPage = () => {
                 />
                 <label htmlFor="agreeTerms" className="ml-2 text-sm text-gray-600 dark:text-gray-400">
                   I agree to the{' '}
-                  <a href="#" className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 underline">
+                  <Link to="/terms" className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 underline">
                     Terms of Service
-                  </a>
+                  </Link>
                 </label>
               </div>
               {errors.agreeTerms && (

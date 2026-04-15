@@ -435,26 +435,6 @@ const EventListPage = () => {
                 </div>
               </div>
 
-              {/* Sort */}
-              <div>
-                <label htmlFor="sort" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Sort By
-                </label>
-                <select
-                  id="sort"
-                  value={filters.sort}
-                  onChange={(e) => handleFilterChange('sort', e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-600
-                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                             focus:ring-2 focus:ring-primary-500 focus:border-primary-500
-                             outline-none cursor-pointer transition-colors"
-                >
-                  {SORT_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
-
               {/* Upcoming Only Toggle */}
               <div className="flex items-center justify-between">
                 <label htmlFor="upcoming" className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -487,11 +467,10 @@ const EventListPage = () => {
               <div className="flex items-center justify-between mb-6">
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Showing <span className="font-semibold text-gray-900 dark:text-white">{startIndex}–{endIndex}</span> of{' '}
-                  <span className="font-semibold text-gray-900 dark:text-white">{totalEvents}</span> events
+                  <span className="font-semibold text-gray-900 dark:text-white">{totalEvents}</span> {totalEvents === 1 ? 'event' : 'events'}
                 </p>
 
-                {/* Desktop Sort (inline) */}
-                <div className="hidden sm:flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <label htmlFor="sort-inline" className="text-sm text-gray-500 dark:text-gray-400">Sort:</label>
                   <select
                     id="sort-inline"

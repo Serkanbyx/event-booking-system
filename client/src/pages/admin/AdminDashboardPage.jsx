@@ -251,13 +251,13 @@ const AdminDashboardPage = () => {
             <span className="text-xs text-gray-400 dark:text-gray-500">By registrations</span>
           </div>
 
-          {topEvents.length === 0 ? (
+          {topEvents.length === 0 || topEvents.every((e) => (e.registrations || e.registeredCount || 0) === 0) ? (
             <div className="p-8 text-center">
               <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                   d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
               </svg>
-              <p className="text-gray-500 dark:text-gray-400">No event data available yet.</p>
+              <p className="text-gray-500 dark:text-gray-400">No registrations recorded yet.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -293,7 +293,7 @@ const AdminDashboardPage = () => {
                         : 'text-green-600 dark:text-green-400';
 
                     return (
-                      <tr key={event._id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                      <tr key={event._id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                         <td className="px-5 py-3.5">
                           <span className="text-sm font-medium text-gray-900 dark:text-white truncate block max-w-[200px]">
                             {event.title}
@@ -340,7 +340,7 @@ const AdminDashboardPage = () => {
               </div>
             ) : (
               recentActivity.slice(0, 10).map((item, index) => (
-                <div key={item._id || index} className="flex items-start gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                <div key={item._id || index} className="flex items-start gap-3 p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                   {ACTIVITY_ICONS[item.type] || ACTIVITY_ICONS.user}
                   <div className="min-w-0 flex-1">
                     <p className="text-sm text-gray-900 dark:text-white leading-snug">

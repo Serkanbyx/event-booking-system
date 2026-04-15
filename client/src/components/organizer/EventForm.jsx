@@ -206,7 +206,7 @@ const EventForm = ({ initialData = null, onSubmit, isEditing = false, isLoading 
   const errorClass = 'mt-1 text-xs text-red-500 dark:text-red-400';
 
   return (
-    <form onSubmit={(e) => handleSubmit(e, false)} className="space-y-8">
+    <form onSubmit={(e) => handleSubmit(e, false)} noValidate className="space-y-8">
       {/* Section 1 — Basic Information */}
       <FormSection title="Basic Information" icon={InfoIcon}>
         {/* Title */}
@@ -276,7 +276,6 @@ const EventForm = ({ initialData = null, onSubmit, isEditing = false, isLoading 
               type="date"
               value={formData.date}
               onChange={handleChange}
-              min={isEditing ? undefined : getTodayString()}
               className={inputClass('date')}
             />
             {errors.date && <p className={errorClass}>{errors.date}</p>}

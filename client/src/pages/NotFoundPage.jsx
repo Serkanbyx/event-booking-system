@@ -5,7 +5,7 @@ const NotFoundPage = () => {
   useDocumentTitle('404 - Page Not Found');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+    <div className="min-h-[calc(100vh-160px)] flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
       <div className="text-center">
         <p className="text-[10rem] sm:text-[12rem] font-extrabold leading-none text-primary-600/20 dark:text-primary-400/20 select-none">
           404
