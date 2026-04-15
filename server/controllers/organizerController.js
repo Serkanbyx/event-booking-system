@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
 const Registration = require('../models/Registration');
-const AppError = require('../utils/AppError');
 
 /**
  * @desc    Aggregated dashboard stats for the logged-in organizer:

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Event = require('../models/Event');
+const AppError = require('../utils/AppError');
 const escapeRegex = require('../utils/escapeRegex');
 
 const ALLOWED_FIELDS = [
@@ -44,9 +45,7 @@ const createEvent = async (req, res, next) => {
     const fields = pickAllowedFields(req.body, ALLOWED_FIELDS);
 
     if (new Date(fields.date) <= new Date()) {
-      const error = new Error('Event date must be in the future');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Event date must be in the future', 400);
     }
 
     fields.organizer = req.user._id;
@@ -70,21 +69,15 @@ const updateEvent = async (req, res, next) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      const error = new Error('Event not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('Event not found', 404);
     }
 
     if (!isOwnerOrAdmin(event, req.user)) {
-      const error = new Error('Not authorized to update this event');
-      error.statusCode = 403;
-      throw error;
+      throw new AppError('Not authorized to update this event', 403);
     }
 
     if (event.status === 'cancelled') {
-      const error = new Error('Cannot update a cancelled event');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Cannot update a cancelled event', 400);
     }
 
     const fields = pickAllowedFields(req.body, ALLOWED_FIELDS);
@@ -93,11 +86,10 @@ const updateEvent = async (req, res, next) => {
       fields.capacity !== undefined &&
       fields.capacity < event.registeredCount
     ) {
-      const error = new Error(
-        'Capacity cannot be reduced below current registrations'
+      throw new AppError(
+        'Capacity cannot be reduced below current registrations',
+        400
       );
-      error.statusCode = 400;
-      throw error;
     }
 
     Object.assign(event, fields);
@@ -119,23 +111,18 @@ const deleteEvent = async (req, res, next) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      const error = new Error('Event not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('Event not found', 404);
     }
 
     if (!isOwnerOrAdmin(event, req.user)) {
-      const error = new Error('Not authorized to delete this event');
-      error.statusCode = 403;
-      throw error;
+      throw new AppError('Not authorized to delete this event', 403);
     }
 
     if (event.registeredCount > 0) {
-      const error = new Error(
-        'Cannot delete event with active registrations. Cancel the event first.'
+      throw new AppError(
+        'Cannot delete event with active registrations. Cancel the event first.',
+        400
       );
-      error.statusCode = 400;
-      throw error;
     }
 
     const Registration = mongoose.models.Registration;
@@ -161,21 +148,15 @@ const publishEvent = async (req, res, next) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      const error = new Error('Event not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('Event not found', 404);
     }
 
     if (!isOwnerOrAdmin(event, req.user)) {
-      const error = new Error('Not authorized to publish this event');
-      error.statusCode = 403;
-      throw error;
+      throw new AppError('Not authorized to publish this event', 403);
     }
 
     if (event.status !== 'draft') {
-      const error = new Error('Only draft events can be published');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Only draft events can be published', 400);
     }
 
     const requiredFields = ['title', 'description', 'date', 'capacity', 'category'];
@@ -186,11 +167,10 @@ const publishEvent = async (req, res, next) => {
     }
 
     if (missingFields.length > 0) {
-      const error = new Error(
-        `Missing required fields: ${missingFields.join(', ')}`
+      throw new AppError(
+        `Missing required fields: ${missingFields.join(', ')}`,
+        400
       );
-      error.statusCode = 400;
-      throw error;
     }
 
     event.status = 'published';
@@ -212,27 +192,19 @@ const cancelEvent = async (req, res, next) => {
     const event = await Event.findById(req.params.id);
 
     if (!event) {
-      const error = new Error('Event not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('Event not found', 404);
     }
 
     if (!isOwnerOrAdmin(event, req.user)) {
-      const error = new Error('Not authorized to cancel this event');
-      error.statusCode = 403;
-      throw error;
+      throw new AppError('Not authorized to cancel this event', 403);
     }
 
     if (!['published', 'draft'].includes(event.status)) {
-      const error = new Error('Only published or draft events can be cancelled');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Only published or draft events can be cancelled', 400);
     }
 
     event.status = 'cancelled';
     await event.save();
-
-    // TODO: Send cancellation emails to all registered attendees (Step 10)
 
     res.status(200).json({
       success: true,
@@ -338,9 +310,7 @@ const getEventBySlug = async (req, res, next) => {
     }).populate('organizer', 'name avatar');
 
     if (!event) {
-      const error = new Error('Event not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('Event not found', 404);
     }
 
     const response = { event };
@@ -376,9 +346,7 @@ const getEventById = async (req, res, next) => {
     }).populate('organizer', 'name avatar');
 
     if (!event) {
-      const error = new Error('Event not found');
-      error.statusCode = 404;
-      throw error;
+      throw new AppError('Event not found', 404);
     }
 
     res.status(200).json({

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { QRCodeSVG } from 'qrcode.react';
 import toast from 'react-hot-toast';
@@ -21,7 +21,6 @@ const STATUS_LABELS = {
 
 const TicketDetailPage = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { user } = useAuth();
 
   const [registration, setRegistration] = useState(null);
@@ -162,7 +161,7 @@ const TicketDetailPage = () => {
         {/* Ticket Card */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm print:shadow-none print:border print:rounded-none">
           {/* Top accent bar */}
-          <div className={`h-2 ${isCancelled ? 'bg-gray-400' : 'bg-primary-500 dark:bg-primary-600'}`} />
+          <div className={`h-2 ${isCancelled ? 'bg-gray-400 dark:bg-gray-600' : 'bg-primary-500 dark:bg-primary-600'}`} />
 
           <div className="p-6 sm:p-8">
             {/* Event Title & Status */}

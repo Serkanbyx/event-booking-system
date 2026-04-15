@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const Registration = require('../models/Registration');
 const Event = require('../models/Event');
 const AppError = require('../utils/AppError');

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const AppError = require('../utils/AppError');
 const generateToken = require('../utils/generateToken');
 
 const LOCK_TIME_MS = 15 * 60 * 1000; // 15 minutes
@@ -16,9 +17,7 @@ const register = async (req, res, next) => {
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      const error = new Error('Email is already registered');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Email is already registered', 400);
     }
 
     const user = await User.create({
@@ -48,9 +47,7 @@ const login = async (req, res, next) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      const error = new Error('Please provide email and password');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Please provide email and password', 400);
     }
 
     const user = await User.findOne({ email }).select(
@@ -59,11 +56,7 @@ const login = async (req, res, next) => {
 
     // Account lockout check
     if (user && user.lockUntil && user.lockUntil > Date.now()) {
-      const error = new Error(
-        'Account temporarily locked. Try again later.'
-      );
-      error.statusCode = 423;
-      throw error;
+      throw new AppError('Account temporarily locked. Try again later.', 423);
     }
 
     const isPasswordValid = user
@@ -83,9 +76,7 @@ const login = async (req, res, next) => {
         await user.save({ validateBeforeSave: false });
       }
 
-      const error = new Error('Invalid email or password');
-      error.statusCode = 401;
-      throw error;
+      throw new AppError('Invalid email or password', 401);
     }
 
     // Successful login — reset counters
@@ -94,9 +85,7 @@ const login = async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     if (!user.isActive) {
-      const error = new Error('Account is deactivated');
-      error.statusCode = 401;
-      throw error;
+      throw new AppError('Account is deactivated', 401);
     }
 
     user.password = undefined;
@@ -157,20 +146,17 @@ const changePassword = async (req, res, next) => {
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
-      const error = new Error(
-        'Please provide current password and new password'
+      throw new AppError(
+        'Please provide current password and new password',
+        400
       );
-      error.statusCode = 400;
-      throw error;
     }
 
     const user = await User.findById(req.user._id).select('+password');
 
     const isMatch = await user.comparePassword(currentPassword);
     if (!isMatch) {
-      const error = new Error('Current password is incorrect');
-      error.statusCode = 401;
-      throw error;
+      throw new AppError('Current password is incorrect', 401);
     }
 
     user.password = newPassword;
@@ -192,18 +178,14 @@ const deleteAccount = async (req, res, next) => {
     const { password } = req.body;
 
     if (!password) {
-      const error = new Error('Please provide your password to confirm');
-      error.statusCode = 400;
-      throw error;
+      throw new AppError('Please provide your password to confirm', 400);
     }
 
     const user = await User.findById(req.user._id).select('+password');
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      const error = new Error('Password is incorrect');
-      error.statusCode = 401;
-      throw error;
+      throw new AppError('Password is incorrect', 401);
     }
 
     // Cascade delete: remove user's registrations if model exists
