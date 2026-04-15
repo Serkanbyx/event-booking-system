@@ -142,8 +142,7 @@ const eventSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
-eventSchema.index({ slug: 1 }, { unique: true });
+// Indexes (slug already indexed via field-level unique: true)
 eventSchema.index({ status: 1, date: 1 });
 eventSchema.index({ organizer: 1 });
 eventSchema.index({ category: 1 });

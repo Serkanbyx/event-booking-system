@@ -56,10 +56,9 @@ const registrationSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
+// Indexes (confirmationCode already indexed via field-level unique: true)
 registrationSchema.index({ user: 1, event: 1 }, { unique: true });
 registrationSchema.index({ event: 1, status: 1 });
-registrationSchema.index({ confirmationCode: 1 }, { unique: true });
 registrationSchema.index({ user: 1, status: 1 });
 
 // Returns count of confirmed registrations for the given event
