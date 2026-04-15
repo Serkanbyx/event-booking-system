@@ -35,13 +35,17 @@ const EventCard = ({ event }) => {
     slug,
     category,
     date,
-    venue,
-    city,
+    location,
+    venue: topVenue,
+    city: topCity,
     price,
     capacity,
     registeredCount = 0,
     image,
   } = event;
+
+  const venue = location?.venue || topVenue;
+  const city = location?.city || topCity;
 
   const eventDate = new Date(date);
   const isEventPast = isPast(eventDate);

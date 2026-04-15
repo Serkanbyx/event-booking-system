@@ -299,7 +299,7 @@ const getAllEvents = async (req, res, next) => {
 
     if (search) {
       const searchRegex = new RegExp(escapeRegex(search), 'i');
-      filter.$or = [{ title: searchRegex }, { description: searchRegex }];
+      filter.title = searchRegex;
     }
 
     if (status && VALID_EVENT_STATUSES.includes(status)) {

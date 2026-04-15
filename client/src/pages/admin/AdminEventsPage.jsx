@@ -72,8 +72,8 @@ const AdminEventsPage = () => {
 
       const response = await adminService.getEvents(params);
       const data = response.data || response;
-      setEvents(data.events || data || []);
-      setTotalPages(data.totalPages || 1);
+      setEvents(data.events || (Array.isArray(data) ? data : []));
+      setTotalPages(data.pagination?.pages || data.totalPages || 1);
     } catch {
       toast.error('Failed to load events');
     } finally {
@@ -95,8 +95,8 @@ const AdminEventsPage = () => {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleChangeStatus = async () => {
@@ -209,7 +209,7 @@ const AdminEventsPage = () => {
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="hidden lg:block bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
@@ -240,7 +240,10 @@ const AdminEventsPage = () => {
                 {events.map((event) => (
                   <tr key={event._id} className="hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
                     <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white truncate block max-w-[220px]">
+                      <span
+                        className="text-sm font-medium text-gray-900 dark:text-white truncate block max-w-[220px]"
+                        title={event.title}
+                      >
                         {event.title}
                       </span>
                     </td>
@@ -458,7 +461,7 @@ const MobileEventCard = ({ event, isOpen, onToggle, onChangeStatus, onDelete, is
   <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
     <div className="flex items-start justify-between gap-3">
       <div className="min-w-0 flex-1">
-        <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate">{event.title}</h3>
+        <h3 className="text-sm font-semibold text-gray-900 dark:text-white truncate" title={event.title}>{event.title}</h3>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
           {event.organizer?.name || event.organizerName || '—'} · {event.date ? format(new Date(event.date), 'MMM dd, yyyy') : '—'}
         </p>

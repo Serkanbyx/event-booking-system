@@ -139,7 +139,14 @@ const HomePage = () => {
         if (categoriesRes.status === 'fulfilled') {
           const rawCat = categoriesRes.value.data?.categories || categoriesRes.value.data || categoriesRes.value || [];
           const catData = Array.isArray(rawCat) ? rawCat : [];
-          if (catData.length > 0) setCategories(catData);
+          if (catData.length > 0) {
+            const normalized = catData.map((c) => ({
+              name: c.name || c.category?.charAt(0).toUpperCase() + c.category?.slice(1) || '',
+              slug: c.slug || c.category || '',
+              eventCount: c.eventCount ?? c.count ?? 0,
+            }));
+            setCategories(normalized);
+          }
         }
       } catch {
         // Silently fail — homepage should still render with defaults
