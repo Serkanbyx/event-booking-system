@@ -351,17 +351,25 @@ event-booking-system/
 
 The following security measures are implemented throughout the application:
 
-- **Helmet** — Sets secure HTTP response headers
-- **CORS** — Restricts cross-origin requests to allowed frontend URL
-- **Rate Limiting** — Multiple tiers: global (100/15min), auth (10/15min), registration, upload, and confirmation-specific limits
-- **MongoDB Sanitization** — Prevents NoSQL injection via `express-mongo-sanitize`
-- **Input Validation** — All endpoints validated with `express-validator` rules
-- **XSS Prevention** — HTML escaping utility for user-generated content
-- **Password Security** — Bcrypt hashing with salt rounds, login attempt tracking, account locking
-- **JWT Security** — Token-based auth with configurable expiration, password change invalidation
-- **File Upload Security** — File type whitelist (JPEG, PNG, GIF, WebP), size limits via Multer
-- **Request Size Limiting** — JSON and URL-encoded body size restrictions
-- **Error Handling** — Centralized error handler that hides internal details in production
+- **Helmet** — Sets secure HTTP response headers with explicit CSP directives
+- **CORS** — Restricts cross-origin requests to allowed frontend URL (never wildcard in production)
+- **Rate Limiting** — Multiple tiers: global (100/15min), auth (10/15min), registration (20/15min), upload (10/15min), and confirmation-specific limits
+- **MongoDB Sanitization** — Prevents NoSQL injection via custom `express-mongo-sanitize` middleware (Express 5 compatible)
+- **Input Validation** — All endpoints validated with `express-validator` rules and centralized validation middleware
+- **XSS Prevention** — HTML escaping utility for user-generated content in email templates via `escapeHtml()`
+- **ReDoS Prevention** — Regex special characters escaped in search queries via `escapeRegex()`
+- **Password Security** — Bcrypt hashing (salt rounds 12), login attempt tracking, account locking after 5 failed attempts
+- **JWT Security** — Token-based auth with configurable expiration, `passwordChangedAt` token invalidation, minimum 32-char secret enforced in production
+- **Mass Assignment Protection** — Only whitelisted fields destructured in every controller
+- **User Enumeration Prevention** — Identical error messages for wrong email and wrong password on login
+- **File Upload Security** — MIME type whitelist (JPEG, PNG, GIF, WebP), 5MB size limit, server-generated filenames, path traversal protection
+- **Request Size Limiting** — JSON and URL-encoded body size restrictions (10kb)
+- **Static File Security** — Directory listing disabled, dotfiles denied
+- **Admin Self-Protection** — Cannot delete self, cannot change own role, last admin check enforced
+- **Atomic Operations** — Race-condition-safe capacity management with `findOneAndUpdate` + `$expr`
+- **Error Handling** — Centralized error handler that hides internal details (stack traces, field names) in production
+
+For a comprehensive 35-item security audit checklist, see **STEP 18** in [`STEPS.md`](STEPS.md).
 
 ## License
 

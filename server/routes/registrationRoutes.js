@@ -4,6 +4,7 @@ const { confirmationLimiter } = require('../middlewares/rateLimiter');
 const validate = require('../middlewares/validate');
 const { paginationRules } = require('../validators/queryValidator');
 const { mongoIdParam } = require('../validators/paramValidator');
+const { confirmationCodeParam } = require('../validators/registrationValidator');
 const {
   cancelRegistration,
   getMyRegistrations,
@@ -16,10 +17,10 @@ const router = express.Router();
 
 // Specific paths BEFORE :id param route
 router.get('/my', protect, paginationRules, validate, getMyRegistrations);
-router.get('/code/:code', protect, confirmationLimiter, getRegistrationByCode);
+router.get('/code/:code', protect, confirmationLimiter, confirmationCodeParam, validate, getRegistrationByCode);
 
-// Check-in (organizer/admin) — :id can be MongoId or confirmation code
-router.put('/:id/check-in', protect, organizerOnly, checkInAttendee);
+// Check-in (organizer/admin)
+router.put('/:id/check-in', protect, organizerOnly, mongoIdParam(), validate, checkInAttendee);
 
 // Param-based routes
 router.get('/:id', protect, mongoIdParam(), validate, getRegistrationById);

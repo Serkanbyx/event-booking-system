@@ -1,4 +1,4 @@
-const { body } = require('express-validator');
+const { body, param } = require('express-validator');
 
 const registerForEventRules = [
   body('notes')
@@ -14,4 +14,13 @@ const registerForEventRules = [
     .withMessage('Ticket type must be standard or vip'),
 ];
 
-module.exports = { registerForEventRules };
+const confirmationCodeParam = [
+  param('code')
+    .trim()
+    .isLength({ min: 12, max: 12 })
+    .withMessage('Invalid confirmation code format')
+    .isAlphanumeric()
+    .withMessage('Confirmation code must be alphanumeric'),
+];
+
+module.exports = { registerForEventRules, confirmationCodeParam };
