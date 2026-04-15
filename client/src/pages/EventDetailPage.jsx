@@ -73,8 +73,12 @@ const EventDetailPage = () => {
     try {
       setLoading(true);
       const response = await getEventBySlug(slug);
-      const eventData = response.data || response;
-      setEvent(eventData);
+      const responseData = response.data || response;
+      const eventObj = responseData.event || responseData;
+      if (responseData.isRegistered) {
+        eventObj.userRegistration = responseData.userRegistration || { _registered: true };
+      }
+      setEvent(eventObj);
 
       if (eventData.category) {
         try {

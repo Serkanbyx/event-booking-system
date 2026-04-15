@@ -52,7 +52,8 @@ const OrganizerEventsPage = () => {
       const params = {};
       if (activeTab !== 'all') params.status = activeTab;
       const response = await eventService.getMyOrganizedEvents(params);
-      setEvents(response.data || response || []);
+      const responseData = response.data || response;
+      setEvents(responseData.events || (Array.isArray(responseData) ? responseData : []));
     } catch {
       toast.error('Failed to load events');
     } finally {
@@ -70,8 +71,8 @@ const OrganizerEventsPage = () => {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const statusCounts = events.reduce(

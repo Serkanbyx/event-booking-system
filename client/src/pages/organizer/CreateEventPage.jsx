@@ -14,7 +14,7 @@ const CreateEventPage = () => {
     try {
       setIsLoading(true);
       const response = await eventService.createEvent(payload);
-      const eventId = response.data?._id || response._id;
+      const eventId = response.data?.event?._id || response.data?._id || response._id;
 
       if (publishAfterSave && eventId) {
         try {

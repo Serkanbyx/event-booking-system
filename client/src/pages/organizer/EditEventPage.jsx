@@ -22,7 +22,7 @@ const EditEventPage = () => {
       setLoading(true);
       setError(null);
       const response = await eventService.getEventById(id);
-      setEvent(response.data || response);
+      setEvent(response.data?.event || response.data || response);
     } catch (err) {
       setError(err.message || 'Failed to load event');
       toast.error('Failed to load event');

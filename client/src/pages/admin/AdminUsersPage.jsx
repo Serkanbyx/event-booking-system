@@ -55,8 +55,8 @@ const AdminUsersPage = () => {
 
       const response = await adminService.getUsers(params);
       const data = response.data || response;
-      setUsers(data.users || data || []);
-      setTotalPages(data.totalPages || 1);
+      setUsers(data.users || (Array.isArray(data) ? data : []));
+      setTotalPages(data.pagination?.pages || data.totalPages || 1);
     } catch {
       toast.error('Failed to load users');
     } finally {
@@ -78,8 +78,8 @@ const AdminUsersPage = () => {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const handleChangeRole = async () => {

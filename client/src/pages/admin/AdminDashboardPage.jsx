@@ -34,7 +34,7 @@ const STAT_CARDS = [
   {
     key: 'totalRegistrations',
     label: 'Total Registrations',
-    breakdownKeys: ['confirmed', 'cancelled', 'attended'],
+    breakdownKeys: ['confirmed', 'cancelledReg', 'attended'],
     breakdownLabels: ['Confirmed', 'Cancelled', 'Attended'],
     icon: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -119,7 +119,32 @@ const AdminDashboardPage = () => {
     const fetchDashboard = async () => {
       try {
         const response = await adminService.getDashboard();
-        setData(response.data || response);
+        const raw = response.data || response;
+
+        const stats = {
+          totalUsers: raw.users?.total || 0,
+          attendees: raw.users?.byRole?.attendee || 0,
+          organizers: raw.users?.byRole?.organizer || 0,
+          admins: raw.users?.byRole?.admin || 0,
+          totalEvents: raw.events?.total || 0,
+          draft: raw.events?.byStatus?.draft || 0,
+          published: raw.events?.byStatus?.published || 0,
+          cancelled: raw.events?.byStatus?.cancelled || 0,
+          completed: raw.events?.byStatus?.completed || 0,
+          totalRegistrations: raw.registrations?.total || 0,
+          confirmed: raw.registrations?.byStatus?.confirmed || 0,
+          cancelledReg: raw.registrations?.byStatus?.cancelled || 0,
+          attended: raw.registrations?.byStatus?.attended || 0,
+          newUsersThisMonth: raw.users?.newThisMonth || 0,
+          newEventsThisMonth: raw.events?.newThisMonth || 0,
+          revenueEstimate: 0,
+        };
+
+        setData({
+          stats,
+          topEvents: raw.topEvents || [],
+          recentActivity: raw.recentActivity || [],
+        });
       } catch {
         // Dashboard should render with defaults
       } finally {

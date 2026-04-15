@@ -56,7 +56,7 @@ router.post(
 
 // Public routes with param (AFTER specific routes)
 router.get('/', globalLimiter, optionalAuth, eventFilterRules, validate, getEvents);
-router.get('/id/:id', globalLimiter, mongoIdParam(), validate, getEventById);
+router.get('/id/:id', globalLimiter, optionalAuth, mongoIdParam(), validate, getEventById);
 router.get('/:slug', globalLimiter, optionalAuth, getEventBySlug);
 
 module.exports = router;

@@ -336,17 +336,34 @@ const getEventBySlug = async (req, res, next) => {
   }
 };
 
-// @desc    Get a single published event by ID (internal use)
+// @desc    Get a single event by ID (owners/admins can see any status)
 // @route   GET /api/events/id/:id
 const getEventById = async (req, res, next) => {
   try {
-    const event = await Event.findOne({
-      _id: req.params.id,
-      status: 'published',
-    }).populate('organizer', 'name avatar');
+    const filter = { _id: req.params.id };
+
+    const isOwnerOrAdminUser =
+      req.user &&
+      (req.user.role === 'admin' || req.user.role === 'organizer');
+
+    if (!isOwnerOrAdminUser) {
+      filter.status = 'published';
+    }
+
+    const event = await Event.findOne(filter).populate('organizer', 'name avatar');
 
     if (!event) {
       throw new AppError('Event not found', 404);
+    }
+
+    if (
+      isOwnerOrAdminUser &&
+      req.user.role === 'organizer' &&
+      event.organizer?._id?.toString() !== req.user._id.toString()
+    ) {
+      if (event.status !== 'published') {
+        throw new AppError('Event not found', 404);
+      }
     }
 
     res.status(200).json({
