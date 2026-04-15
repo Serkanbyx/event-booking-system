@@ -96,7 +96,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: '/events', label: 'Events', visible: true },
-    { to: '/my-tickets', label: 'My Tickets', visible: isAuthenticated && isAttendee },
+    { to: '/tickets', label: 'My Tickets', visible: isAuthenticated && isAttendee },
     { to: '/organizer', label: 'Dashboard', visible: isOrganizer },
     { to: '/admin', label: 'Admin', visible: isAdmin },
     { to: '/organizer/events/create', label: 'Create Event', visible: isOrganizer },
@@ -171,7 +171,7 @@ const Navbar = () => {
                           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                         </div>
 
-                        {isAttendee && <DropdownLink to="/my-tickets">My Tickets</DropdownLink>}
+                        {isAttendee && <DropdownLink to="/tickets">My Tickets</DropdownLink>}
                         {isOrganizer && <DropdownLink to="/organizer">Dashboard</DropdownLink>}
                         {isAdmin && <DropdownLink to="/admin">Admin Panel</DropdownLink>}
                         <DropdownLink to="/settings">Settings</DropdownLink>
