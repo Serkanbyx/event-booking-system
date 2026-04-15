@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import ScrollToTop from './components/common/ScrollToTop';
 
 // Layouts
 import MainLayout from './components/layout/MainLayout';
@@ -45,6 +46,7 @@ import AdminRegistrationsPage from './pages/admin/AdminRegistrationsPage';
 const App = () => {
   return (
     <>
+      <ScrollToTop />
       <Toaster
         position="top-right"
         toastOptions={{
@@ -55,9 +57,11 @@ const App = () => {
           },
           className: 'dark:!bg-gray-800 dark:!text-gray-100',
           success: {
+            duration: 4000,
             iconTheme: { primary: '#10b981', secondary: '#fff' },
           },
           error: {
+            duration: 6000,
             iconTheme: { primary: '#ef4444', secondary: '#fff' },
           },
         }}
