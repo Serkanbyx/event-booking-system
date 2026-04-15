@@ -593,9 +593,47 @@ const EventDetailPage = () => {
             <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
               Confirm Registration
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-6">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Are you sure you want to register for <span className="font-semibold text-gray-900 dark:text-white">{event.title}</span>?
             </p>
+
+            {/* Event summary */}
+            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4 space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-500 dark:text-gray-400">Date</span>
+                <span className="font-medium text-gray-900 dark:text-white">
+                  {format(new Date(event.date), 'MMM dd, yyyy')}
+                </span>
+              </div>
+              {(venue || city) && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">Location</span>
+                  <span className="font-medium text-gray-900 dark:text-white text-right max-w-[200px] truncate">
+                    {venue || city}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm border-t border-gray-200 dark:border-gray-600 pt-2">
+                <span className="text-gray-500 dark:text-gray-400">Price</span>
+                <span className="font-bold text-lg text-gray-900 dark:text-white">
+                  {formatCurrency(event.price || 0, event.currency || 'USD')}
+                </span>
+              </div>
+            </div>
+
+            {/* Payment notice for paid events */}
+            {event.price > 0 && (
+              <div className="flex items-start gap-2.5 p-3 mb-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <svg className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+                <p className="text-sm text-amber-800 dark:text-amber-300">
+                  Payment of <span className="font-semibold">{formatCurrency(event.price, event.currency || 'USD')}</span> will be collected at the venue. By confirming, you reserve your spot.
+                </p>
+              </div>
+            )}
+
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowRegisterModal(false)}
@@ -614,8 +652,10 @@ const EventDetailPage = () => {
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Registering...
                   </>
+                ) : event.price > 0 ? (
+                  `Confirm & Reserve (${formatCurrency(event.price, event.currency || 'USD')})`
                 ) : (
-                  'Confirm'
+                  'Confirm Registration'
                 )}
               </button>
             </div>

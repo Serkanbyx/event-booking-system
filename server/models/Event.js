@@ -162,11 +162,14 @@ eventSchema.virtual('isPast').get(function () {
   return this.date < new Date();
 });
 
+// Normalize title for slug: dots → hyphens so "Next.js" becomes "next-js" instead of "nextjs"
+const normalizeForSlug = (title) => slugify(title.replace(/\./g, '-'), { lower: true, strict: true });
+
 // Generate unique slug from title on save (Mongoose 9 — no next)
 eventSchema.pre('save', async function () {
   if (!this.isModified('title')) return;
 
-  this.slug = slugify(this.title, { lower: true, strict: true });
+  this.slug = normalizeForSlug(this.title);
 
   const existingSlug = await mongoose
     .model('Event')
@@ -182,7 +185,7 @@ eventSchema.pre('findOneAndUpdate', async function () {
   const update = this.getUpdate();
   if (!update.title) return;
 
-  let slug = slugify(update.title, { lower: true, strict: true });
+  let slug = normalizeForSlug(update.title);
 
   const filter = this.getFilter();
   const existingSlug = await mongoose

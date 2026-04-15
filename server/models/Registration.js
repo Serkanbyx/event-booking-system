@@ -19,7 +19,7 @@ const registrationSchema = new mongoose.Schema(
     confirmationCode: {
       type: String,
       unique: true,
-      required: [true, 'Confirmation code is required'],
+      default: () => uuid.v4().replace(/-/g, '').substring(0, 12).toUpperCase(),
     },
     status: {
       type: String,
@@ -61,17 +61,6 @@ registrationSchema.index({ user: 1, event: 1 }, { unique: true });
 registrationSchema.index({ event: 1, status: 1 });
 registrationSchema.index({ confirmationCode: 1 }, { unique: true });
 registrationSchema.index({ user: 1, status: 1 });
-
-// Auto-generate 12-char uppercase confirmation code from UUID (Mongoose 9 — no next)
-registrationSchema.pre('save', async function () {
-  if (this.isNew && !this.confirmationCode) {
-    this.confirmationCode = uuid
-      .v4()
-      .replace(/-/g, '')
-      .substring(0, 12)
-      .toUpperCase();
-  }
-});
 
 // Returns count of confirmed registrations for the given event
 registrationSchema.statics.getConfirmedCount = async function (eventId) {

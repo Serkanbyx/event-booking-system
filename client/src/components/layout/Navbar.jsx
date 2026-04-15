@@ -171,7 +171,7 @@ const Navbar = () => {
                           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
                         </div>
 
-                        {isAttendee && <DropdownLink to="/tickets">My Tickets</DropdownLink>}
+                        <DropdownLink to="/tickets">My Tickets</DropdownLink>
                         {isOrganizer && (
                           <>
                             <DropdownLink to="/organizer">Dashboard</DropdownLink>
