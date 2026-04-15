@@ -10,6 +10,11 @@ export const getEventBySlug = async (slug) => {
   return response.data;
 };
 
+export const getEventById = async (id) => {
+  const response = await axiosInstance.get(`/api/events/id/${id}`);
+  return response.data;
+};
+
 export const getFeaturedEvents = async () => {
   const response = await axiosInstance.get('/api/events/featured');
   return response.data;
